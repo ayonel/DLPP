@@ -12,6 +12,8 @@ from src.constants import *
 from src.eval.eval_utils import precision_recall_f1
 from src.utils import *
 
+from sklearn.metrics import auc
+from sklearn.metrics import roc_curve
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import IsolationForest
@@ -144,10 +146,10 @@ def run(client, clf, print_prf=False, print_main_proportion=False):
 
 # 按月训练
 @mongo
-def run_monthly(client, clf, print_prf=False, print_main_proportion=False, MonthGAP=1, persistence=False):
+def run_monthly(client, clf, print_prf=False, print_main_proportion=False, print_AUC= False, MonthGAP=1, persistence=False):
     data_dict, pullinfo_list_dict = load_data_monthly(ayonel_numerical_attr=ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
                                   ayonel_categorical_attr_handler=ayonel_categorical_attr_handler, MonthGAP=MonthGAP)
-    for org, repo in org_list:
+    for org, repo in [('zendframework', 'joomla')]:
         pullinfo_list = pullinfo_list_dict[org]
         batch_iter = data_dict[org]
         train_batch = batch_iter.__next__()
@@ -155,6 +157,7 @@ def run_monthly(client, clf, print_prf=False, print_main_proportion=False, Month
         train_y = np.array(train_batch[1])
         cursor = train_y.size  # 游标，用于记录第一条开始预测pr的位置
         predict_result = []
+        predict_result_prob = []
         actual_result = []
         mean_accuracy = 0
 
@@ -176,6 +179,7 @@ def run_monthly(client, clf, print_prf=False, print_main_proportion=False, Month
 
             actual_result += test_y.tolist()  # 真实结果
             predict_result += clf.predict(test_X).tolist()  # 预测结果
+            predict_result_prob += [x[0] for x in clf.predict_proba(test_X).tolist()]
             mean_accuracy += clf.score(test_X, test_y)
             train_X = np.concatenate((train_X, test_X))
             train_y = np.concatenate((train_y, test_y))
@@ -206,18 +210,25 @@ def run_monthly(client, clf, print_prf=False, print_main_proportion=False, Month
         precision, recall, F1 = precision_recall_f1(predict_result, actual_result)
 
         if print_prf:
-            print(",%f,%f,%f" % (precision, recall, F1), end='')
+            print(',%f,%f,%f' % (precision, recall, F1), end='')
 
         if print_main_proportion:
             main_proportion = predict_result.count(1) / len(predict_result)
             print(',%f' % (main_proportion if main_proportion > 0.5 else 1 - main_proportion), end='')
-        print()
 
+        if print_AUC:
+            actual_main_proportion = actual_result.count(1) / len(actual_result)
+
+            pos_label = 1 if actual_main_proportion > 0.5 else 0
+            y = np.array(actual_result)
+            pred = np.array(predict_result_prob)
+            fpr, tpr, thresholds = roc_curve(y, pred, pos_label=pos_label)
+            print(',%f' % auc(fpr, tpr), end='')
+        print()
 
 if __name__ == '__main__':
     clf = XGBClassifier(seed=RANDOM_SEED)
-
-    run_monthly(clf, False, False, MonthGAP=1, persistence=False)
+    run_monthly(clf, True, True, True, MonthGAP=1, persistence=False)
 
     # run(XGBClassifier(seed=RANDOM_SEED))
 

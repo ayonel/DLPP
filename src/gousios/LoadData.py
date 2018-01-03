@@ -47,7 +47,7 @@ def load_data(client, gousios_attr_list=None):
 
     for org, repo in org_list:
         # 获取属性信息
-        attrdata_list = sorted(list(client[org]['gousios'].find({'is_irec': True})), key=lambda x: int(x['number']))
+        attrdata_list = sorted(list(client[org]['gousios'].find()), key=lambda x: int(x['number']))
         attr_list = []
 
         for pull in attrdata_list:
@@ -72,7 +72,7 @@ def load_data_monthly(client, gousios_attr_list=None, MonthGAP=None):
     data_dict = {}
     for org, repo in org_list:
         # 获取属性信息
-        attrdata_list = sorted(list(client[org]['gousios'].find({'is_irec': True})), key=lambda x: int(x['number']))
+        attrdata_list = sorted(list(client[org]['gousios'].find()), key=lambda x: int(x['number']))
         # 构造标签y
         # 先构造一个字典，key-value分别为number和merged
         is_merged = {}

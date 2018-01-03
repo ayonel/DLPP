@@ -7,8 +7,6 @@ import pymongo
 import re
 
 
-
-
 def build_empty_result_dict(pull_list):
     result_dict= {}
     for number in pull_list:
@@ -181,7 +179,8 @@ if __name__ == '__main__':
         print('num_comments num_particpants conflict forward_link计算完毕')
         # 计算提交者历史通过率，历史提交次数，项目最近通过率
         result_dict = cal_passrate(pull_list,pull_dict,result_dict)
-        print(result_dict)
+        # print(result_dict)
+
         # 开始保存
         for result in result_dict:
             result_dict[result]['number'] = result

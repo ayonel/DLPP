@@ -207,20 +207,11 @@ if __name__ == '__main__':
 
 
         result_dict = cal_history_pr_num_decay(pull_list, pull_dict, result_dict)
-
         result_dict = file_stat_decay(pull_dict, file_close_dict)
         result_dict = last_pr_decay(pull_dict, pull_list)
         # 查询commitfile_list
-        # commitfile_list = list(db['commitfile'].find())
+        commitfile_list = list(db['commitfile'].find())
         # 计算代码属性
-        # result_dict = cal_src(pull_list, pull_dict, result_dict)
-        # result_dict = text_forward_link(pull_list, pull_dict, result_dict)
-        # result_dict = text_code_proportion(pull_list, pull_dict, result_dict)
-        # result_dict = is_reviewer_commit(pull_list, pull_dict, result_dict, reviewer_set)
-        # result_dict = review_time(pull_list, pull_dict, result_dict)
-        # result_dict = recent_event(client, pull_list, pull_dict, result_dict)
-        # result_dict = file_stat(pull_dict, file_close_dict)
-        # result_dict = last_pr(pull_dict, pull_list)
         for pr in result_dict:
             client[org]['ayonel'].update({'number': pr}, {'$set': result_dict[pr]})
 

@@ -73,7 +73,7 @@ def load_data(client, ayonel_numerical_attr=None, ayonel_boolean_attr=None, ayon
     pullinfo_list_dict = {}  # 键为每个项目，值为每个项目的pr信息列表
     for org, repo in org_list:
         # 获取属性信息
-        attrdata_list = sorted(list(client[org]['ayonel'].find({'is_irec': True})), key=lambda x: int(x['number']))
+        attrdata_list = sorted(list(client[org]['ayonel'].find()), key=lambda x: int(x['number']))
         # 归一化
         # regular(attrinfo_list, ayonel_regular_attr)
 
@@ -110,7 +110,7 @@ def load_data_monthly(client, ayonel_numerical_attr=None, ayonel_boolean_attr=No
     pullinfo_list_dict = {}  # 键为每个项目，值为每个项目的pr信息列表
     for org, repo in org_list:
         # 获取属性信息
-        attrdata_list = sorted(list(client[org]['ayonel'].find({'is_irec': True})), key=lambda x: int(x['number']))
+        attrdata_list = sorted(list(client[org]['ayonel'].find()), key=lambda x: int(x['number']))
         # 归一化
         # regular(attrdata_list, ayonel_regular_attr)
         # bool2int
@@ -145,7 +145,5 @@ def load_data_monthly(client, ayonel_numerical_attr=None, ayonel_boolean_attr=No
         pullinfo_list_dict[org] = pullinfo_list
     return data_dict, pullinfo_list_dict
 
-if __name__ == '__main__':
-    print()
 
 

@@ -21,9 +21,8 @@ def migerate(client):
                 'perc_ext_contribs': attr['perc_ext_contribs'],
                 'team_size': attr['team_size']
             }
-
             client[org]['ayonel'].update({'number': attr['number']}, {'$set': data}, upsert=True)
 
 if __name__ == '__main__':
-    for org,repo in org_list:
-        print("mongodump -h 192.168.1.102 -d "+org)
+    # migerate()
+    pass

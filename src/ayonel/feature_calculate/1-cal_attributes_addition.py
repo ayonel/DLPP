@@ -21,24 +21,24 @@ def build_empty_result_dict(pull_list):
     for number in pull_list:
         number = str(number)
         result_dict[number] = {}
-        # result_dict[number]['src_addition'] = 0     # ok
-        # result_dict[number]['src_deletion'] = 0     # ok
-        # result_dict[number]['text_code_proportion'] = 0     # ok
-        # result_dict[number]['history_commit_review_time'] = 0     # ok
-        # result_dict[number]['recent_3_month_pr'] = 0     # ok
-        # result_dict[number]['recent_3_month_commit'] = 0     # ok
-        # result_dict[number]['is_reviewer_commit'] = False
-        # result_dict[number]['text_forward_link'] = False     # title和body中是否含有外链ok
+        result_dict[number]['src_addition'] = 0     # ok
+        result_dict[number]['src_deletion'] = 0     # ok
+        result_dict[number]['text_code_proportion'] = 0     # ok
+        result_dict[number]['history_commit_review_time'] = 0     # ok
+        result_dict[number]['recent_3_month_pr'] = 0     # ok
+        result_dict[number]['recent_3_month_commit'] = 0     # ok
+        result_dict[number]['is_reviewer_commit'] = False
+        result_dict[number]['text_forward_link'] = False     # title和body中是否含有外链ok
 
-        result_dict[number]['week'] = 0  # pr提交时是周几
-        result_dict[number]['pr_file_merged_count'] = 0  # pr中的file的历史merge数
-        result_dict[number]['pr_file_merged_proportion'] = 0  # pr中的file的历史merge率
-        result_dict[number]['pr_file_rejected_count'] = 0  # pr中的file的历史reject数
-        result_dict[number]['pr_file_rejected_proportion'] = 0  # pr中的file的历史reject率
-        result_dict[number]['pr_file_submitted_count'] = 0  # pr中的file的历史pr提交数
-        result_dict[number]['last_pr'] = True  # 上一个pr是接受还是拒绝
-        result_dict[number]['last_10_pr_merged'] = 0  # 上10个pr中的merge数
-        result_dict[number]['last_10_pr_rejected'] = 0  # 上10个pr中的拒绝数
+        # result_dict[number]['week'] = 0  # pr提交时是周几
+        # result_dict[number]['pr_file_merged_count'] = 0  # pr中的file的历史merge数
+        # result_dict[number]['pr_file_merged_proportion'] = 0  # pr中的file的历史merge率
+        # result_dict[number]['pr_file_rejected_count'] = 0  # pr中的file的历史reject数
+        # result_dict[number]['pr_file_rejected_proportion'] = 0  # pr中的file的历史reject率
+        # result_dict[number]['pr_file_submitted_count'] = 0  # pr中的file的历史pr提交数
+        # result_dict[number]['last_pr'] = True  # 上一个pr是接受还是拒绝
+        # result_dict[number]['last_10_pr_merged'] = 0  # 上10个pr中的merge数
+        # result_dict[number]['last_10_pr_rejected'] = 0  # 上10个pr中的拒绝数
     return result_dict
 
 
@@ -266,21 +266,23 @@ if __name__ == '__main__':
 
         # 获取file_merge_dict
         file_close_dict = get_file_close_dict(pull_dict)
-        # reviewer_set = set([x['name'] for x in list(client[org]['reviewer'].find())])
+        reviewer_set = set([x['name'] for x in list(client[org]['reviewer'].find())])
         result_dict = build_empty_result_dict(pull_list)
 
         # 查询commitfile_list
-        # commitfile_list = list(db['commitfile'].find())
+        commitfile_list = list(db['commitfile'].find())
         # 计算代码属性
-        # result_dict = cal_src(pull_list, pull_dict, result_dict)
-        # result_dict = text_forward_link(pull_list, pull_dict, result_dict)
-        # result_dict = text_code_proportion(pull_list, pull_dict, result_dict)
-        # result_dict = is_reviewer_commit(pull_list, pull_dict, result_dict, reviewer_set)
-        # result_dict = review_time(pull_list, pull_dict, result_dict)
-        # result_dict = recent_event(client, pull_list, pull_dict, result_dict)
-        result_dict = week(pullinfo_list)
-        result_dict = file_stat(pull_dict, file_close_dict)
-        result_dict = last_pr(pull_dict, pull_list)
+        result_dict = cal_src(pull_list, pull_dict, result_dict)
+        result_dict = text_forward_link(pull_list, pull_dict, result_dict)
+        result_dict = text_code_proportion(pull_list, pull_dict, result_dict)
+        result_dict = is_reviewer_commit(pull_list, pull_dict, result_dict, reviewer_set)
+        result_dict = review_time(pull_list, pull_dict, result_dict)
+        result_dict = recent_event(client, pull_list, pull_dict, result_dict)
+
+        # result_dict = week(pullinfo_list)
+        # result_dict = file_stat(pull_dict, file_close_dict)
+        # result_dict = last_pr(pull_dict, pull_list)
+
         for pr in result_dict:
             client[org]['ayonel'].update({'number': pr}, {'$set': result_dict[pr]})
 
