@@ -149,7 +149,7 @@ def run(client, clf, print_prf=False, print_main_proportion=False):
 def run_monthly(client, clf, print_prf=False, print_main_proportion=False, print_AUC= False, MonthGAP=1, persistence=False):
     data_dict, pullinfo_list_dict = load_data_monthly(ayonel_numerical_attr=ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
                                   ayonel_categorical_attr_handler=ayonel_categorical_attr_handler, MonthGAP=MonthGAP)
-    for org, repo in [('zendframework', 'joomla')]:
+    for org, repo in org_list:
         pullinfo_list = pullinfo_list_dict[org]
         batch_iter = data_dict[org]
         train_batch = batch_iter.__next__()
@@ -218,7 +218,6 @@ def run_monthly(client, clf, print_prf=False, print_main_proportion=False, print
 
         if print_AUC:
             actual_main_proportion = actual_result.count(1) / len(actual_result)
-
             pos_label = 1 if actual_main_proportion > 0.5 else 0
             y = np.array(actual_result)
             pred = np.array(predict_result_prob)

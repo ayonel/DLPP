@@ -11,14 +11,10 @@ from collections import Counter
 from src.gousios.LoadData import *
 from src.constants import *
 from src.eval.eval_utils import precision_recall_f1
-
-import matplotlib.pyplot as plt
-from sklearn import metrics
 from sklearn.metrics import roc_curve, auc
 from sklearn.ensemble import RandomForestClassifier
 from xgboost.sklearn import XGBClassifier
 from imblearn.over_sampling import SMOTE, ADASYN
-
 
 
 SEG_PROPORTION = 8/10
@@ -82,16 +78,17 @@ def run(clf, print_prf=False, print_main_proportion=False):
 
 
 
-def run_monthly(clf, print_prf=False, print_main_proportion=False, MonthGAP=1):
-    data_dict = load_data_monthly(gousios_attr_list=['num_commits'], MonthGAP=MonthGAP)
+def run_monthly(clf, print_prf=False, print_main_proportion=False, print_AUC=False, MonthGAP=1):
+    data_dict = load_data_monthly(gousios_attr_list=gousios_attr_list, MonthGAP=MonthGAP)
     for org,repo in org_list:
-    # for org,repo in [('hrydgard', 'ppsspp'),]:
+        print(org+",", end='')
         batch_iter = data_dict[org]
         train_batch = batch_iter.__next__()
         train_X = np.array(train_batch[0])
         train_y = np.array(train_batch[1])
         predict_result = []
         actual_result = []
+        predict_result_prob = []
         samples = 0
 
         for batch in batch_iter:
@@ -104,7 +101,7 @@ def run_monthly(clf, print_prf=False, print_main_proportion=False, MonthGAP=1):
 
             actual_result += test_y.tolist()  # 真实结果
             predict_result += clf.predict(test_X).tolist()  # 预测结果
-
+            predict_result_prob += [x[0] for x in clf.predict_proba(test_X).tolist()]
             samples += test_X.size
 
 
@@ -123,13 +120,17 @@ def run_monthly(clf, print_prf=False, print_main_proportion=False, MonthGAP=1):
         if print_main_proportion:
             main_proportion = predict_result.count(1) / len(predict_result)
             print(',%f' % (main_proportion if main_proportion > 0.5 else 1 - main_proportion), end='')
+
+        if print_AUC:
+            y = np.array(actual_result)
+            pred = np.array(predict_result_prob)
+            fpr, tpr, thresholds = roc_curve(y, pred, pos_label=1)
+            AUC = auc(fpr, tpr)
+            print(',%f' % AUC if AUC > 0.5 else 1-AUC, end='')
         print()
-
-
-
 if __name__ == '__main__':
     clf = RandomForestClassifier(random_state=RANDOM_SEED)
-    run_monthly(clf, False, True, MonthGAP=1)
+    run_monthly(clf, True, True, True, MonthGAP=1)
     # run(clf)
 
 
