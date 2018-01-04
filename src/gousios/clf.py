@@ -78,7 +78,7 @@ def run(clf, print_prf=False, print_main_proportion=False):
 
 
 
-def run_monthly(clf, print_prf=False, print_main_proportion=False, print_AUC=False, MonthGAP=1):
+def run_monthly(clf, print_prf=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1):
     data_dict = load_data_monthly(gousios_attr_list=gousios_attr_list, MonthGAP=MonthGAP)
     for org,repo in org_list:
         print(org+",", end='')
@@ -117,6 +117,11 @@ def run_monthly(clf, print_prf=False, print_main_proportion=False, print_AUC=Fal
         if print_prf:
             print(",%f,%f,%f" % (precision, recall, F1), end='')
 
+        if print_prf_each:
+            merged_precision, merged_recall, merged_F1 = precision_recall_f1(predict_result, actual_result, POSITIVE=0)
+            rejected_precision, rejected_recall, rejected_F1 = precision_recall_f1(predict_result, actual_result, POSITIVE=1)
+            print(',%f,%f,%f,%f,%f,%f' % (merged_F1, merged_precision, merged_recall, rejected_F1,rejected_precision, rejected_recall ), end='')
+
         if print_main_proportion:
             main_proportion = predict_result.count(1) / len(predict_result)
             print(',%f' % (main_proportion if main_proportion > 0.5 else 1 - main_proportion), end='')
@@ -126,11 +131,11 @@ def run_monthly(clf, print_prf=False, print_main_proportion=False, print_AUC=Fal
             pred = np.array(predict_result_prob)
             fpr, tpr, thresholds = roc_curve(y, pred, pos_label=1)
             AUC = auc(fpr, tpr)
-            print(',%f' % AUC if AUC > 0.5 else 1-AUC, end='')
+            print(',%f' % (AUC if AUC > 0.5 else 1-AUC), end='')
         print()
 if __name__ == '__main__':
     clf = RandomForestClassifier(random_state=RANDOM_SEED)
-    run_monthly(clf, True, True, True, MonthGAP=1)
+    run_monthly(clf, print_prf=False, print_prf_each=True, print_main_proportion=False, print_AUC=True, MonthGAP=1)
     # run(clf)
 
 

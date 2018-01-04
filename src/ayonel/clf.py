@@ -146,10 +146,11 @@ def run(client, clf, print_prf=False, print_main_proportion=False):
 
 # 按月训练
 @mongo
-def run_monthly(client, clf, print_prf=False, print_main_proportion=False, print_AUC= False, MonthGAP=1, persistence=False):
+def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1, persistence=False):
     data_dict, pullinfo_list_dict = load_data_monthly(ayonel_numerical_attr=ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
                                   ayonel_categorical_attr_handler=ayonel_categorical_attr_handler, MonthGAP=MonthGAP)
     for org, repo in org_list:
+        print(org+",", end='')
         pullinfo_list = pullinfo_list_dict[org]
         batch_iter = data_dict[org]
         train_batch = batch_iter.__next__()
@@ -212,22 +213,28 @@ def run_monthly(client, clf, print_prf=False, print_main_proportion=False, print
         if print_prf:
             print(',%f,%f,%f' % (precision, recall, F1), end='')
 
+        if print_prf_each:
+            merged_precision, merged_recall, merged_F1 = precision_recall_f1(predict_result, actual_result, POSITIVE=0)
+            rejected_precision, rejected_recall, rejected_F1 = precision_recall_f1(predict_result, actual_result, POSITIVE=1)
+            print(',%f,%f,%f,%f,%f,%f' % (merged_F1, merged_precision, merged_recall, rejected_F1,rejected_precision, rejected_recall ), end='')
+
+
         if print_main_proportion:
             main_proportion = predict_result.count(1) / len(predict_result)
             print(',%f' % (main_proportion if main_proportion > 0.5 else 1 - main_proportion), end='')
 
         if print_AUC:
-            actual_main_proportion = actual_result.count(1) / len(actual_result)
-            pos_label = 1 if actual_main_proportion > 0.5 else 0
             y = np.array(actual_result)
             pred = np.array(predict_result_prob)
-            fpr, tpr, thresholds = roc_curve(y, pred, pos_label=pos_label)
-            print(',%f' % auc(fpr, tpr), end='')
+            fpr, tpr, thresholds = roc_curve(y, pred)
+            AUC = auc(fpr, tpr)
+            print(',%f' % (AUC if AUC > 0.5 else 1 - AUC), end='')
+
         print()
 
 if __name__ == '__main__':
     clf = XGBClassifier(seed=RANDOM_SEED)
-    run_monthly(clf, True, True, True, MonthGAP=1, persistence=False)
+    run_monthly(clf, print_prf=False, print_prf_each=True, print_main_proportion=False, print_AUC=True, MonthGAP=1, persistence=False)
 
     # run(XGBClassifier(seed=RANDOM_SEED))
 
