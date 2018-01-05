@@ -3,6 +3,19 @@
 from src.constants import *
 from src.database.dbutil import *
 
+gousios_attr_list = [
+    'num_commits',
+    'src_churn',
+    'test_churn',
+    'files_changes',
+    'sloc',
+    'team_size',
+    'perc_ext_contribs',
+    'commits_files_touched',
+    'test_lines_per_kloc',
+    'prev_pullreqs',
+    'requester_succ_rate'
+]
 
 class MonthData(object):
     def __init__(self, data, gap=1):
@@ -29,9 +42,14 @@ class MonthData(object):
                     count += 1
                 else:
                     break
-            self.start_month = self.end_month
-            self.end_month = self.start_month + self.gap
-            self.cursor += count
+            if count == 0:  # 该月无数据
+                self.start_month = self.end_month
+                self.end_month = self.start_month + self.gap
+                self.cursor += 1
+            else:
+                self.start_month = self.end_month
+                self.end_month = self.start_month + self.gap
+                self.cursor += count
             return X_batch, y_batch
         raise StopIteration()
     def reset(self):
@@ -82,6 +100,7 @@ def load_data_monthly(client, gousios_attr_list=None, MonthGAP=None):
             is_merged[pullinfo['number']] = pullinfo['merged']
             month_dict[pullinfo['number']] = pullinfo['month']
 
+
         attr_list = []
         for pull in attrdata_list:
             pull['test'] = 0
@@ -94,4 +113,7 @@ def load_data_monthly(client, gousios_attr_list=None, MonthGAP=None):
         data_dict[org] = MonthData((attr_list, label_list), gap=MonthGAP)
     return data_dict
 if __name__ == '__main__':
-    load_data_monthly()
+    pass
+
+
+

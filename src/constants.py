@@ -36,12 +36,12 @@ org_list = [
     ('zendframework', 'zendframework'),
 
     #-----------以下为极为不平衡的6个项目-----------
-    # ('apache', 'spark'),
-    # ('nodejs', 'node-v0.x-archive'),
-    # ('angular', 'angular.js'),
-    # ('Wikia', 'app'),
-    # ('wet-boew', 'wet-boew'),
-    # ('dimagi', 'commcare-hq'),
+    ('apache', 'spark'),
+    ('nodejs', 'node-v0.x-archive'),
+    ('angular', 'angular.js'),
+    ('Wikia', 'app'),
+    ('wet-boew', 'wet-boew'),
+    ('dimagi', 'commcare-hq'),
 ]
 
 rest_org_list = [

@@ -90,7 +90,6 @@ def run_monthly(clf, print_prf=False, print_prf_each=False, print_main_proportio
         actual_result = []
         predict_result_prob = []
         samples = 0
-
         for batch in batch_iter:
             if len(batch[0]) == 0:  # 测试集没有数据，直接预测下一batch
                 continue

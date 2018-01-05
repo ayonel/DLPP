@@ -33,9 +33,12 @@ from sklearn.metrics import roc_auc_score
 from sklearn.tree import DecisionTreeClassifier
 from xgboost.sklearn import XGBClassifier
 from imblearn.over_sampling import SMOTE, ADASYN
+from sklearn.model_selection import train_test_split as tts
+from imblearn.combine import SMOTEENN
 from sklearn.utils import shuffle
 from scipy.sparse import coo_matrix
-
+from costcla.models import CostSensitiveRandomForestClassifier
+from costcla.models import CostSensitiveBaggingClassifier
 
 SEG_PROPORTION = 8/10
 FOLDS = 5
@@ -149,6 +152,7 @@ def run(client, clf, print_prf=False, print_main_proportion=False):
 def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1, persistence=False):
     data_dict, pullinfo_list_dict = load_data_monthly(ayonel_numerical_attr=ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
                                   ayonel_categorical_attr_handler=ayonel_categorical_attr_handler, MonthGAP=MonthGAP)
+
     for org, repo in org_list:
         print(org+",", end='')
         pullinfo_list = pullinfo_list_dict[org]
@@ -170,13 +174,29 @@ def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_p
             # X_sparse = coo_matrix(train_X)
             # train_X, X_sparse, train_y = shuffle(train_X, X_sparse, train_y, random_state=0)
 
-            # train(clf, train_X, train_y)
-            if train_y.tolist().count(0) <= 6 or train_y.tolist().count(1) <= 6:
-                train(clf, train_X, train_y)
-            else:
-                resample_train_X, resample_train_y = SMOTE(random_state=RANDOM_SEED, ratio='auto').fit_sample(train_X, train_y)
-                train(clf, resample_train_X, resample_train_y)
-            # train(clf, train_X, train_y)
+
+            # 正常训练
+            train(clf, train_X, train_y)
+
+            # cost_mat = []
+            # T_count = 0
+            # F_count = 0
+            # for label in train_y:
+            #     if label == 1:
+            #         T_count += 1
+            #     else:
+            #         F_count += 1
+            #     cost_mat.append([T_count, F_count, 0, 0])
+            #
+            # clf.fit(train_X, train_y, np.array(cost_mat))
+
+            # # 过采样
+            # if train_y.tolist().count(0) <= 6 or train_y.tolist().count(1) <= 6:
+            #     train(clf, train_X, train_y)
+            # else:
+            #     print(len(batch[0]))
+            #     resample_train_X, resample_train_y = SMOTE(ratio='auto', random_state=RANDOM_SEED).fit_sample(train_X, train_y)
+            #     train(clf, resample_train_X, resample_train_y)
 
             actual_result += test_y.tolist()  # 真实结果
             predict_result += clf.predict(test_X).tolist()  # 预测结果
@@ -234,6 +254,8 @@ def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_p
 
 if __name__ == '__main__':
     clf = XGBClassifier(seed=RANDOM_SEED)
+    # clf = RandomForestClassifier(random_state=RANDOM_SEED, class_weight='balanced_subsample')
+    # clf = CostSensitiveBaggingClassifier()
     run_monthly(clf, print_prf=False, print_prf_each=True, print_main_proportion=False, print_AUC=True, MonthGAP=1, persistence=False)
 
     # run(XGBClassifier(seed=RANDOM_SEED))

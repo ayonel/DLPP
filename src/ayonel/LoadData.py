@@ -141,6 +141,13 @@ def load_data_monthly(client, ayonel_numerical_attr=None, ayonel_boolean_attr=No
         for pull in attrdata_list:
             label_list.append(0 if is_merged[int(pull['number'])] else 1)
 
+        # for k, v in enumerate(attr_list):
+        #     # print(v)
+        #     if k!= 0:
+        #         if attr_list[k][0] < attr_list[k-1][0]:
+        #             print(attr_list[k-1])
+        #             print(attrdata_list[k-1])
+        # exit()
         data_dict[org] = MonthData((attr_list, label_list), gap=MonthGAP)
         pullinfo_list_dict[org] = pullinfo_list
     return data_dict, pullinfo_list_dict
