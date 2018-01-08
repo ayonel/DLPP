@@ -134,7 +134,7 @@ def run_monthly(clf, print_prf=False, print_prf_each=False, print_main_proportio
         print()
 if __name__ == '__main__':
     clf = RandomForestClassifier(random_state=RANDOM_SEED)
-    run_monthly(clf, print_prf=False, print_prf_each=True, print_main_proportion=False, print_AUC=True, MonthGAP=1)
+    run_monthly(clf, print_prf=False, print_prf_each=True, print_main_proportion=False, print_AUC=True, MonthGAP=6)
     # run(clf)
 
 

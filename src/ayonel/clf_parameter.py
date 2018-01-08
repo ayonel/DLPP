@@ -54,7 +54,6 @@ ayonel_numerical_attr = [
     'commits_files_touched',
     'history_commit_passrate',
 
-    # 后来补充
     'src_addition',
     'pr_file_rejected_count',
     'team_size',
@@ -63,35 +62,19 @@ ayonel_numerical_attr = [
     'src_churn',
     'text_code_proportion',
 
-    # 后来补充稍差
-    # 'history_commit_review_time',
-    # 'recent_1_month_project_pr_num',  # 降
-    # 'pr_file_merged_count',  # 降 17
-    # 'pr_file_submitted_count',  # 降
-    # 'recent_3_month_project_pr_num',  # 降
-    # 'recent_3_month_pr',  # 降 21
-    # 'pr_file_merged_proportion',  # 降
-    # 'recent_3_month_commit',
-    # 'recent_project_passrate',  # 降26
+]
 
-    # 太差
-    # 'history_pr_num_decay',# 降
-    # 'pr_file_rejected_count_decay',
-    # 'perc_ext_contribs',  # 降 29
-    # 'pr_file_merged_count_decay',
-    # 'body_similarity_merged',
-    # 'title_similarity_rejected', # 降32
-    # 'pr_file_submitted_count_decay',
-    # 'recent_3_month_project_pr_num_decay', # 降34
-    # 'title_similarity_merged',
-    # 'last_10_pr_merged_decay',# 降
-    # 'recent_1_month_project_pr_num_decay',# 降
-    # 'body_similarity_rejected',# 降 38
-    # 'file_similarity_merged',
-    # 'text_similarity_merged',
-    # 'file_similarity_rejected',# 降 38
-    # 'text_similarity_rejected',# 降 38
-    # 'last_10_pr_rejected_decay',
+
+to_add = [
+    'history_commit_review_time',
+    'recent_1_month_project_pr_num',  # 降
+    'pr_file_merged_count',  # 降 17
+    'pr_file_submitted_count',  # 降
+    'recent_3_month_project_pr_num',  # 降
+    'recent_3_month_pr',  # 降 21
+    'pr_file_merged_proportion',  # 降
+    'recent_3_month_commit',
+    'recent_project_passrate',  # 降26
 
 ]
 
@@ -150,12 +133,14 @@ def run(client, clf, print_prf=False, print_main_proportion=False):
 
 # 按月训练
 @mongo
-def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1, persistence=False):
-    data_dict, pullinfo_list_dict = load_data_monthly(ayonel_numerical_attr=ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
-                                  ayonel_categorical_attr_handler=ayonel_categorical_attr_handler, MonthGAP=MonthGAP)
+def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1, persistence=False, ayonel_numerical_attr=[]):
 
+    this_ayonel_numerical_attr = ayonel_numerical_attr
+    data_dict, pullinfo_list_dict = load_data_monthly(ayonel_numerical_attr=this_ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
+                                  ayonel_categorical_attr_handler=ayonel_categorical_attr_handler, MonthGAP=MonthGAP)
+    accuracy = 0
     for org, repo in org_list:
-        print(org+",", end='')
+        # print(org+",", end='')
         pullinfo_list = pullinfo_list_dict[org]
         batch_iter = data_dict[org]
         train_batch = batch_iter.__next__()
@@ -227,36 +212,43 @@ def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_p
 
                 client[persistence_db][persistence_col].insert(data)
 
-        print(acc_num / len(actual_result), end='')
-        precision, recall, F1 = precision_recall_f1(predict_result, actual_result)
+        accuracy+= acc_num / len(actual_result)
 
-        if print_prf:
-            print(',%f,%f,%f' % (precision, recall, F1), end='')
+        # precision, recall, F1 = precision_recall_f1(predict_result, actual_result)
+        #
+        # if print_prf:
+        #     print(',%f,%f,%f' % (precision, recall, F1), end='')
+        #
+        # if print_prf_each:
+        #     merged_precision, merged_recall, merged_F1 = precision_recall_f1(predict_result, actual_result, POSITIVE=0)
+        #     rejected_precision, rejected_recall, rejected_F1 = precision_recall_f1(predict_result, actual_result, POSITIVE=1)
+        #     print(',%f,%f,%f,%f,%f,%f' % (merged_F1, merged_precision, merged_recall, rejected_F1,rejected_precision, rejected_recall ), end='')
+        #
+        #
+        # if print_main_proportion:
+        #     main_proportion = predict_result.count(1) / len(predict_result)
+        #     print(',%f' % (main_proportion if main_proportion > 0.5 else 1 - main_proportion), end='')
+        #
+        # if print_AUC:
+        #     y = np.array(actual_result)
+        #     pred = np.array(predict_result_prob)
+        #     fpr, tpr, thresholds = roc_curve(y, pred)
+        #     AUC = auc(fpr, tpr)
+        #     print(',%f' % (AUC if AUC > 0.5 else 1 - AUC), end='')
+        # print()
+    return accuracy/len(org_list)
 
-        if print_prf_each:
-            merged_precision, merged_recall, merged_F1 = precision_recall_f1(predict_result, actual_result, POSITIVE=0)
-            rejected_precision, rejected_recall, rejected_F1 = precision_recall_f1(predict_result, actual_result, POSITIVE=1)
-            print(',%f,%f,%f,%f,%f,%f' % (merged_F1, merged_precision, merged_recall, rejected_F1,rejected_precision, rejected_recall ), end='')
-
-
-        if print_main_proportion:
-            main_proportion = predict_result.count(1) / len(predict_result)
-            print(',%f' % (main_proportion if main_proportion > 0.5 else 1 - main_proportion), end='')
-
-        if print_AUC:
-            y = np.array(actual_result)
-            pred = np.array(predict_result_prob)
-            fpr, tpr, thresholds = roc_curve(y, pred)
-            AUC = auc(fpr, tpr)
-            print(',%f' % (AUC if AUC > 0.5 else 1 - AUC), end='')
-
-        print()
 
 if __name__ == '__main__':
+    base = 0.821306229
     clf = XGBClassifier(seed=RANDOM_SEED)
     # clf = RandomForestClassifier(random_state=RANDOM_SEED, class_weight='balanced_subsample')
     # clf = CostSensitiveBaggingClassifier()
-    run_monthly(clf, print_prf=False, print_prf_each=True, print_main_proportion=False, print_AUC=True, MonthGAP=6, persistence=False)
+
+    for k,param in enumerate(to_add):
+        accuracy = run_monthly(clf, print_prf=False, print_prf_each=True, print_main_proportion=False, print_AUC=True, MonthGAP=6, persistence=False, ayonel_numerical_attr=ayonel_numerical_attr+[param])
+        if accuracy > base:
+            print(param+','+str(accuracy))
 
     # run(XGBClassifier(seed=RANDOM_SEED))
 
