@@ -31,7 +31,7 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import roc_auc_score
 from sklearn.tree import DecisionTreeClassifier
-from xgboost.sklearn import XGBClassifier
+from xgboost import XGBClassifier
 from imblearn.over_sampling import SMOTE, ADASYN
 from sklearn.model_selection import train_test_split as tts
 from imblearn.combine import SMOTEENN
@@ -54,6 +54,7 @@ ayonel_numerical_attr = [
     'commits_files_touched',
     'history_commit_passrate',
 
+    # 后来补充
     'src_addition',
     'pr_file_rejected_count',
     'team_size',
@@ -61,20 +62,37 @@ ayonel_numerical_attr = [
     'pr_file_rejected_proportion',  # 降
     'src_churn',
     'text_code_proportion',
+    'pr_file_merged_count_decay',
+    'history_pr_num_decay',  # 降
+    'pr_file_submitted_count_decay',
 
-]
+    # 后来补充稍差
+    # 'history_commit_review_time',
+    # 'recent_1_month_project_pr_num',  # 降
+    # 'pr_file_merged_count',  # 降 17
+    # 'pr_file_submitted_count',  # 降
+    # 'recent_3_month_project_pr_num',  # 降
+    # 'recent_3_month_pr',  # 降 21
+    # 'pr_file_merged_proportion',  # 降
+    # 'recent_3_month_commit',
+    # 'recent_project_passrate',  # 降26
 
 
-to_add = [
-    'history_commit_review_time',
-    'recent_1_month_project_pr_num',  # 降
-    'pr_file_merged_count',  # 降 17
-    'pr_file_submitted_count',  # 降
-    'recent_3_month_project_pr_num',  # 降
-    'recent_3_month_pr',  # 降 21
-    'pr_file_merged_proportion',  # 降
-    'recent_3_month_commit',
-    'recent_project_passrate',  # 降26
+    # 太差
+    # 'pr_file_rejected_count_decay',
+    # 'perc_ext_contribs',  # 降 29
+    # 'body_similarity_merged',
+    # 'title_similarity_rejected', # 降32
+    # 'recent_3_month_project_pr_num_decay', # 降34
+    # 'title_similarity_merged',
+    # 'last_10_pr_merged_decay',# 降
+    # 'recent_1_month_project_pr_num_decay',# 降
+    # 'body_similarity_rejected',# 降 38
+    # 'file_similarity_merged',
+    # 'text_similarity_merged',
+    # 'file_similarity_rejected',# 降 38
+    # 'text_similarity_rejected',# 降 38
+    # 'last_10_pr_rejected_decay',
 
 ]
 
@@ -90,7 +108,6 @@ ayonel_boolean_attr = [
 ayonel_categorical_attr_handler = [
     ('week', week_handler)
 ]
-
 
 def train(clf, X, y):
     clf.fit(X, y)
@@ -133,14 +150,12 @@ def run(client, clf, print_prf=False, print_main_proportion=False):
 
 # 按月训练
 @mongo
-def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1, persistence=False, ayonel_numerical_attr=[]):
-
-    this_ayonel_numerical_attr = ayonel_numerical_attr
-    data_dict, pullinfo_list_dict = load_data_monthly(ayonel_numerical_attr=this_ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
+def run_monthly(client, MonthGAP=1):
+    data_dict, pullinfo_list_dict = load_data_monthly(ayonel_numerical_attr=ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
                                   ayonel_categorical_attr_handler=ayonel_categorical_attr_handler, MonthGAP=MonthGAP)
-    accuracy = 0
+
     for org, repo in org_list:
-        # print(org+",", end='')
+        print(org+",")
         pullinfo_list = pullinfo_list_dict[org]
         batch_iter = data_dict[org]
         train_batch = batch_iter.__next__()
@@ -151,104 +166,56 @@ def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_p
         predict_result_prob = []
         actual_result = []
         mean_accuracy = 0
-
+        round = 1
         for batch in batch_iter:
             if len(batch[0]) == 0:  # 测试集没有数据，直接预测下一batch
                 continue
             test_X = np.array(batch[0])
             test_y = np.array(batch[1])
-            # X_sparse = coo_matrix(train_X)
-            # train_X, X_sparse, train_y = shuffle(train_X, X_sparse, train_y, random_state=0)
+            parameters = [
+                ("criterion", ["gini", "entropy"]),
+                ("max_features", ["auto", "sqrt", "log2"]),
+                ("min_weight_fraction_leaf", iandfrange(0, 0.501, 0.05)),
+                ("oob_score", [True, False]),
+            ]
 
+            tuned_params = {}  # 已调好的参数
+            for k, v in enumerate(parameters):
+                tuning_param = {}
+                tuning_param[v[0]] = v[1]
+                estimator_rf = RandomForestClassifier(random_state=RANDOM_SEED, **tuned_params)
+                clf = GridSearchCV(
+                    estimator=estimator_rf,
+                    param_grid=tuning_param,
+                    scoring="accuracy", cv=3)
+                clf.fit(train_X, train_y)
+                tuned_params = dict(tuned_params, **clf.best_params_)
 
-            # 正常训练
-            train(clf, train_X, train_y)
+            print(tuned_params)
+            # 入库
+            client[org]['model'].update({'round': round, 'model': 'randomforest', 'gap': MonthGAP}, {'$set': tuned_params}, upsert=True)
 
-            # cost_mat = []
-            # T_count = 0
-            # F_count = 0
-            # for label in train_y:
-            #     if label == 1:
-            #         T_count += 1
-            #     else:
-            #         F_count += 1
-            #     cost_mat.append([T_count, F_count, 0, 0])
-            #
-            # clf.fit(train_X, train_y, np.array(cost_mat))
+            best_est = XGBClassifier(seed=RANDOM_SEED, **tuned_params)
 
-            # # # 过采样
-            # if train_y.tolist().count(0) <= 6 or train_y.tolist().count(1) <= 6:
-            #     train(clf, train_X, train_y)
-            # else:
-            #     resample_train_X, resample_train_y = SMOTE(ratio='auto', random_state=RANDOM_SEED).fit_sample(train_X, train_y)
-            #     train(clf, resample_train_X, resample_train_y)
+            train(best_est, train_X, train_y)
+
+            print(best_est.score(test_X, test_y))
 
             actual_result += test_y.tolist()  # 真实结果
-            predict_result += clf.predict(test_X).tolist()  # 预测结果
-            predict_result_prob += [x[0] for x in clf.predict_proba(test_X).tolist()]
-            mean_accuracy += clf.score(test_X, test_y)
+            predict_result += best_est.predict(test_X).tolist()  # 预测结果
+            predict_result_prob += [x[0] for x in best_est.predict_proba(test_X).tolist()]
+            mean_accuracy += best_est.score(test_X, test_y)
             train_X = np.concatenate((train_X, test_X))
             train_y = np.concatenate((train_y, test_y))
+            round += 1
 
         acc_num = 0
         for i in range(len(actual_result)):
             if actual_result[i] == predict_result[i]:
                 acc_num += 1
-        # 需要将结果入库
-        if persistence:
-            for i in range(len(predict_result)):
-                number = int(pullinfo_list[cursor + i]['number'])
-                data = {
-                    'number':           number,
-                    'org':              org,
-                    'repo':             repo,
-                    'created_at':       float(pullinfo_list[cursor + i]['created_at']),
-                    'closed_at':        float(pullinfo_list[cursor + i]['closed_at']),
-                    'title':            pullinfo_list[cursor + i]['title'],
-                    'submitted_by':     pullinfo_list[cursor + i]['author'],
-                    'merged':           pullinfo_list[cursor + i]['merged'],
-                    'predict_merged':   True if predict_result[i] == 0 else False
-                }
-
-                client[persistence_db][persistence_col].insert(data)
-
-        accuracy+= acc_num / len(actual_result)
-
-        # precision, recall, F1 = precision_recall_f1(predict_result, actual_result)
-        #
-        # if print_prf:
-        #     print(',%f,%f,%f' % (precision, recall, F1), end='')
-        #
-        # if print_prf_each:
-        #     merged_precision, merged_recall, merged_F1 = precision_recall_f1(predict_result, actual_result, POSITIVE=0)
-        #     rejected_precision, rejected_recall, rejected_F1 = precision_recall_f1(predict_result, actual_result, POSITIVE=1)
-        #     print(',%f,%f,%f,%f,%f,%f' % (merged_F1, merged_precision, merged_recall, rejected_F1,rejected_precision, rejected_recall ), end='')
-        #
-        #
-        # if print_main_proportion:
-        #     main_proportion = predict_result.count(1) / len(predict_result)
-        #     print(',%f' % (main_proportion if main_proportion > 0.5 else 1 - main_proportion), end='')
-        #
-        # if print_AUC:
-        #     y = np.array(actual_result)
-        #     pred = np.array(predict_result_prob)
-        #     fpr, tpr, thresholds = roc_curve(y, pred)
-        #     AUC = auc(fpr, tpr)
-        #     print(',%f' % (AUC if AUC > 0.5 else 1 - AUC), end='')
-        # print()
-    return accuracy/len(org_list)
-
+        print(acc_num / len(actual_result))
 
 if __name__ == '__main__':
-    base = 0.821306229
-    clf = XGBClassifier(seed=RANDOM_SEED)
-    # clf = RandomForestClassifier(random_state=RANDOM_SEED, class_weight='balanced_subsample')
-    # clf = CostSensitiveBaggingClassifier()
+    run_monthly(MonthGAP=6)
 
-    for k,param in enumerate(to_add):
-        accuracy = run_monthly(clf, print_prf=False, print_prf_each=True, print_main_proportion=False, print_AUC=True, MonthGAP=6, persistence=False, ayonel_numerical_attr=ayonel_numerical_attr+[param])
-        if accuracy > base:
-            print(param+','+str(accuracy))
-
-    # run(XGBClassifier(seed=RANDOM_SEED))
 

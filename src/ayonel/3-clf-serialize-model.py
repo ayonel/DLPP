@@ -110,12 +110,12 @@ if __name__ == '__main__':
 
         ###############################################################################
 
-        # clf = GridSearchCV(
-        #         estimator=estimator,
-        #         param_grid=parameters,
-        #         scoring="accuracy",
-        #         cv=TimeSeriesSplit(n_splits=FOLDS)
-        # )
+        clf = GridSearchCV(
+                estimator=estimator,
+                param_grid=parameters,
+                scoring="accuracy",
+                cv=TimeSeriesSplit(n_splits=FOLDS)
+        )
 
         train(clf, train_X, train_y)
         accuracy = clf.score(test_X, test_y)
@@ -125,6 +125,10 @@ if __name__ == '__main__':
 
         # # client[org]['result'].insert({clf.__class__.__name__: accuracy})
         print(accuracy)
+
+
+
+
 
 
 

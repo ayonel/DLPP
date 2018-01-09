@@ -24,5 +24,20 @@ def migerate(client):
             client[org]['ayonel'].update({'number': attr['number']}, {'$set': data}, upsert=True)
 
 if __name__ == '__main__':
-    # migerate()
-    pass
+    from sklearn.model_selection import GridSearchCV
+    from xgboost import XGBClassifier
+    import numpy as np
+    X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+    y = np.array([1, 0, 0, 1])
+    est = XGBClassifier()
+    params = {
+        'learning_rate': [0.5, 0, 1]
+    }
+    clf = GridSearchCV(
+        estimator=est,
+        param_grid=params,
+        scoring="accuracy",
+        cv=2
+    )
+    clf.fit(X, y)
+    print(clf.best_params_)

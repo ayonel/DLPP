@@ -4,6 +4,15 @@
  Blog: https://ayonel.me
  GitHub: https://github.com/ayonel
  E-mail: ayonel@qq.com
+
+ 特征选择方法：
+ 先在ayonel_numerical_attr中按照单决策树 选取了前10个重要特征
+
+ 在之后的选择中，以这10个特征为基础，逐个加入剩余特征，并输出平均准确率。
+
+ 选择提升最多的一个特征，并将这个特征纳入基础特征集合，再逐个加入剩余特征，直到准确率无提升。
+
+
 '''
 import numpy as np
 import csv
@@ -31,7 +40,7 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import roc_auc_score
 from sklearn.tree import DecisionTreeClassifier
-from xgboost.sklearn import XGBClassifier
+from xgboost import XGBClassifier
 from imblearn.over_sampling import SMOTE, ADASYN
 from sklearn.model_selection import train_test_split as tts
 from imblearn.combine import SMOTEENN
@@ -62,6 +71,9 @@ ayonel_numerical_attr = [
     'pr_file_rejected_proportion',  # 降
     'src_churn',
     'text_code_proportion',
+    'pr_file_merged_count_decay',
+    'history_pr_num_decay',  # 降
+    'pr_file_submitted_count_decay',
 
     # 后来补充稍差
     # 'history_commit_review_time',
@@ -74,14 +86,12 @@ ayonel_numerical_attr = [
     # 'recent_3_month_commit',
     # 'recent_project_passrate',  # 降26
 
+
     # 太差
-    # 'history_pr_num_decay',# 降
     # 'pr_file_rejected_count_decay',
     # 'perc_ext_contribs',  # 降 29
-    # 'pr_file_merged_count_decay',
     # 'body_similarity_merged',
     # 'title_similarity_rejected', # 降32
-    # 'pr_file_submitted_count_decay',
     # 'recent_3_month_project_pr_num_decay', # 降34
     # 'title_similarity_merged',
     # 'last_10_pr_merged_decay',# 降
@@ -150,7 +160,7 @@ def run(client, clf, print_prf=False, print_main_proportion=False):
 
 # 按月训练
 @mongo
-def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1, persistence=False):
+def run_monthly(client, model, print_prf=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1, persistence=False):
     data_dict, pullinfo_list_dict = load_data_monthly(ayonel_numerical_attr=ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
                                   ayonel_categorical_attr_handler=ayonel_categorical_attr_handler, MonthGAP=MonthGAP)
 
@@ -167,6 +177,7 @@ def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_p
         actual_result = []
         mean_accuracy = 0
 
+        round = 1
         for batch in batch_iter:
             if len(batch[0]) == 0:  # 测试集没有数据，直接预测下一batch
                 continue
@@ -175,9 +186,20 @@ def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_p
             # X_sparse = coo_matrix(train_X)
             # train_X, X_sparse, train_y = shuffle(train_X, X_sparse, train_y, random_state=0)
 
+            clf = None
+
+            if model == "xgboost":
+                parameters = client[org]['model'].find_one({'model': 'xgboost', 'round':round, 'gap': MonthGAP}, {'_id': 0, 'model': 0, 'gap': 0})
+                clf = XGBClassifier(seed=RANDOM_SEED, **parameters)
+                train(clf, train_X, train_y)
+            elif model == 'randomforest':
+                parameters = client[org]['model'].find_one({'model': 'randomforest', 'round': round, 'gap': MonthGAP}, {'_id': 0, 'model': 0, 'gap': 0})
+                clf = RandomForestClassifier(random_state=RANDOM_SEED, **parameters)
+                train(clf, train_X, train_y)
+            else:
+                raise RuntimeError("请指定分类器")
 
             # 正常训练
-            train(clf, train_X, train_y)
 
             # cost_mat = []
             # T_count = 0
@@ -204,6 +226,7 @@ def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_p
             mean_accuracy += clf.score(test_X, test_y)
             train_X = np.concatenate((train_X, test_X))
             train_y = np.concatenate((train_y, test_y))
+            round += 1
 
         acc_num = 0
         for i in range(len(actual_result)):
@@ -249,14 +272,14 @@ def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_p
             fpr, tpr, thresholds = roc_curve(y, pred)
             AUC = auc(fpr, tpr)
             print(',%f' % (AUC if AUC > 0.5 else 1 - AUC), end='')
-
         print()
 
 if __name__ == '__main__':
-    clf = XGBClassifier(seed=RANDOM_SEED)
+
+    model = 'xgboost'
     # clf = RandomForestClassifier(random_state=RANDOM_SEED, class_weight='balanced_subsample')
     # clf = CostSensitiveBaggingClassifier()
-    run_monthly(clf, print_prf=False, print_prf_each=True, print_main_proportion=False, print_AUC=True, MonthGAP=6, persistence=False)
+    run_monthly(model, print_prf=False, print_prf_each=True, print_main_proportion=False, print_AUC=True, MonthGAP=6, persistence=False)
 
     # run(XGBClassifier(seed=RANDOM_SEED))
 
