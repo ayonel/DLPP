@@ -76,8 +76,6 @@ def run(clf, print_prf=False, print_main_proportion=False):
     print(str(ACC/len(org_list)))
 
 
-
-
 def run_monthly(clf, print_prf=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1):
     data_dict = load_data_monthly(gousios_attr_list=gousios_attr_list, MonthGAP=MonthGAP)
     for org,repo in org_list:

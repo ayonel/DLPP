@@ -41,6 +41,7 @@ from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import roc_auc_score
 from sklearn.tree import DecisionTreeClassifier
 from xgboost import XGBClassifier
+import xgboost as xgb
 from imblearn.over_sampling import SMOTE, ADASYN
 from sklearn.model_selection import train_test_split as tts
 from imblearn.combine import SMOTEENN
@@ -162,9 +163,51 @@ def run(client, clf, print_prf=False, print_main_proportion=False):
 
 # 按月训练
 @mongo
-def run_monthly(client, model, deserialize=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1, persistence=False):
+def run_monthly(client, model, deserialize=False, over_sample=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1, persistence=False):
     data_dict, pullinfo_list_dict = load_data_monthly(ayonel_numerical_attr=ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
                                   ayonel_categorical_attr_handler=ayonel_categorical_attr_handler, MonthGAP=MonthGAP)
+
+    # 构造代价矩阵
+    def _cal_cost_mat(train_y):
+        cost_mat = []
+        T_count = 0
+        F_count = 0
+        for label in train_y:
+            if label == 1:
+                T_count += 1
+            else:
+                F_count += 1
+
+        for i in range(len(train_y)):
+            cost_mat.append([0.0, 0.0, 0.0, 0.0])
+        return np.array(cost_mat)
+
+    # 初始化分类器
+    def _init_classifier(model, deserialize):
+        clf = None
+        if deserialize:
+            if model == "xgboost":
+                parameters = client[org]['model'].find_one({'model': 'xgboost', 'round': round, 'gap': MonthGAP},
+                                                           {'_id': 0, 'model': 0, 'gap': 0, 'round': 0})
+                clf = XGBClassifier(seed=RANDOM_SEED, **parameters)
+            elif model == 'randomforest':
+                parameters = client[org]['model'].find_one({'model': 'randomforest', 'round': round, 'gap': MonthGAP},
+                                                           {'_id': 0, 'model': 0, 'gap': 0, 'round': 0})
+                clf = RandomForestClassifier(random_state=RANDOM_SEED, **parameters)
+            else:
+                raise RuntimeError("请指定分类器")
+        else:
+            if model == "xgboost":
+                clf = XGBClassifier(seed=RANDOM_SEED)
+            elif model == 'randomforest':
+                clf = RandomForestClassifier(random_state=RANDOM_SEED)
+            elif model == 'costsensitiverandomforest':
+                clf = CostSensitiveBaggingClassifier()
+            else:
+                raise RuntimeError("请指定分类器")
+        if clf == None:
+            raise RuntimeError("分类器初始化失败")
+        return clf
 
     for org, repo in org_list:
         print(org+",", end='')
@@ -178,67 +221,47 @@ def run_monthly(client, model, deserialize=False, print_prf_each=False, print_ma
         predict_result_prob = []
         actual_result = []
         mean_accuracy = 0
-
         round = 1
         for batch in batch_iter:
             if len(batch[0]) == 0:  # 测试集没有数据，直接预测下一batch
                 continue
             test_X = np.array(batch[0])
             test_y = np.array(batch[1])
-            # X_sparse = coo_matrix(train_X)
-            # train_X, X_sparse, train_y = shuffle(train_X, X_sparse, train_y, random_state=0)
+            clf = _init_classifier(model, deserialize)
 
-            clf = None
-            if deserialize:
-                if model == "xgboost":
-                    parameters = client[org]['model'].find_one({'model': 'xgboost', 'round':round, 'gap': MonthGAP}, {'_id': 0, 'model': 0, 'gap': 0, 'round': 0})
-                    clf = XGBClassifier(seed=RANDOM_SEED, **parameters)
-                    train(clf, train_X, train_y)
-                elif model == 'randomforest':
-                    parameters = client[org]['model'].find_one({'model': 'randomforest', 'round': round, 'gap': MonthGAP}, {'_id': 0, 'model': 0, 'gap': 0, 'round': 0})
-                    clf = RandomForestClassifier(random_state=RANDOM_SEED, **parameters)
+            ########################################SMOTE过采样#####################################
+            if over_sample:
+                if model == 'costsensitiverandomforest':
+                    if train_y.tolist().count(0) <= 6 or train_y.tolist().count(1) <= 6:
+                        # cost_mat = np.zeros((len(train_y), 4))
+                        # cost_mat[:, 0] = 0.0,                   # false_positive_cost
+                        # cost_mat[:, 1] = 0.0                    # false_positive_cost
+                        # cost_mat[:, 2] = 0.0                    # true_positive_cost
+                        # cost_mat[:, 3] = 0.0,                   # true_negative_cost
+                        clf.fit(train_X, train_y, _cal_cost_mat(train_y))
+                    else:
+                        resample_train_X, resample_train_y = SMOTE(ratio='auto', random_state=RANDOM_SEED).fit_sample(
+                            train_X, train_y)
+                        clf.fit(resample_train_X, resample_train_y, _cal_cost_mat(resample_train_y))
+                else:
+                    if train_y.tolist().count(0) <= 6 or train_y.tolist().count(1) <= 6:
+                        train(clf, train_X, train_y)
+                    else:
+                        resample_train_X, resample_train_y = SMOTE(ratio='auto', random_state=RANDOM_SEED).fit_sample(
+                            train_X, train_y)
+                        train(clf, resample_train_X, resample_train_y)
+            else:   # 正常
+                if model == 'xgboost':
+                    negative_count = (np.sum(train_y == 0))
+                    positive_count = (np.sum(train_y == 1))
+                    ratio = 1
+                    if positive_count != 0:
+                        ratio = negative_count/positive_count
+                    clf = XGBClassifier(seed=RANDOM_SEED, scale_pos_weight=ratio)
                     train(clf, train_X, train_y)
                 else:
-                    raise RuntimeError("请指定分类器")
-            else:
-                if model == "xgboost":
-                    clf = XGBClassifier(seed=RANDOM_SEED)
                     train(clf, train_X, train_y)
-                elif model == 'randomforest':
-                    clf = RandomForestClassifier(random_state=RANDOM_SEED)
-                    train(clf, train_X, train_y)
-                elif model == 'costsensitiverandomforest':
-                    clf = CostSensitiveBaggingClassifier()
-                    cost_mat = []
-                    T_count = 0
-                    F_count = 0
-                    for label in train_y:
-                        if label == 1:
-                            T_count += 1
-                        else:
-                            F_count += 1
-
-                    for i in range(len(train_y)):
-                        cost_mat.append([0.0,0.0,0.0,0.0])
-
-                    # cost_mat = np.zeros((len(train_y), 4))
-                    # cost_mat[:, 0] = 0.0,                   # false_positive_cost
-                    # cost_mat[:, 1] = 0.0                    # false_positive_cost
-                    # cost_mat[:, 2] = 0.0                    # true_positive_cost
-                    # cost_mat[:, 3] = 0.0,                   # true_negative_cost
-
-                    clf.fit(train_X, train_y, np.array(cost_mat))
-                else:
-                    raise RuntimeError("请指定分类器")
-
-            # print(clf.score(test_X, test_y))
-
-            # # # 过采样
-            # if train_y.tolist().count(0) <= 6 or train_y.tolist().count(1) <= 6:
-            #     train(clf, train_X, train_y)
-            # else:
-            #     resample_train_X, resample_train_y = SMOTE(ratio='auto', random_state=RANDOM_SEED).fit_sample(train_X, train_y)
-            #     train(clf, resample_train_X, resample_train_y)
+                # print(clf.score(test_X, test_y))
             actual_result += test_y.tolist()  # 真实结果
             predict_result += clf.predict(test_X).tolist()  # 预测结果
             predict_result_prob += [x[0] for x in clf.predict_proba(test_X).tolist()]
@@ -247,6 +270,8 @@ def run_monthly(client, model, deserialize=False, print_prf_each=False, print_ma
             train_y = np.concatenate((train_y, test_y))
             round += 1
 
+
+        # 开始输出结果
         acc_num = 0
         for i in range(len(actual_result)):
             if actual_result[i] == predict_result[i]:
@@ -270,8 +295,7 @@ def run_monthly(client, model, deserialize=False, print_prf_each=False, print_ma
                 client[persistence_db][persistence_col].insert(data)
 
         print(acc_num / len(actual_result), end='')
-        # print(predict_result)
-        # print(actual_result)
+
 
         if print_prf_each:
             merged_precision, merged_recall, merged_F1 = precision_recall_f1(predict_result, actual_result, POSITIVE=0)
@@ -299,7 +323,7 @@ if __name__ == '__main__':
     # model = 'randomforest'
     # clf = RandomForestClassifier(random_state=RANDOM_SEED, class_weight='balanced_subsample')
     # clf = CostSensitiveBaggingClassifier()
-    run_monthly(model, deserialize=True, print_prf_each=True, print_main_proportion=False, print_AUC=True, MonthGAP=6, persistence=False)
+    run_monthly(model, deserialize=False, over_sample=False, print_prf_each=True, print_main_proportion=False, print_AUC=True, MonthGAP=6, persistence=False)
 
     # run(XGBClassifier(seed=RANDOM_SEED))
 
