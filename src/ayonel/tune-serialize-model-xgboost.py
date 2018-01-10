@@ -154,7 +154,7 @@ def run_monthly(client, MonthGAP=1):
     data_dict, pullinfo_list_dict = load_data_monthly(ayonel_numerical_attr=ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
                                   ayonel_categorical_attr_handler=ayonel_categorical_attr_handler, MonthGAP=MonthGAP)
 
-    for org, repo in org_list:
+    for org, repo in [('dimagi','xxx')]:
         print(org+",")
         pullinfo_list = pullinfo_list_dict[org]
         batch_iter = data_dict[org]
@@ -177,13 +177,12 @@ def run_monthly(client, MonthGAP=1):
             parameters = [
                 ("learning_rate", iandfrange(0, 1, 0.05)),
                 ("gamma", iandfrange(0, 1, 0.1) + iandfrange(1, 10, 1)),
-                # ("objective", ["binary:logistic", "rank:pairwise"]),
-                ("objective", ["rank:pairwise", "binary:logistic", ]),
+                ("objective", ["binary:logistic", "rank:pairwise"]),
                 ("max_depth", range(1, len(batch[0][0]) + 1)),
                 ("min_child_weight", range(1, len(batch[0][0]) + 1)),
                 ("subsample", iandfrange(0, 1.01, 0.1)),
                 ("colsample_bytree", iandfrange(0.1, 1.01, 0.1)),
-                ("scale_pos_weight",[np.sum(test_y == 0) / np.sum(test_y == 1)])
+                # ("scale_pos_weight",[np.sum(test_y == 0) / np.sum(test_y == 1)])
             ]
 
             tuned_params = {}  # 已调好的参数
@@ -194,7 +193,7 @@ def run_monthly(client, MonthGAP=1):
                 clf = GridSearchCV(
                     estimator=estimator_xg,
                     param_grid=tuning_param,
-                    scoring="accuracy", cv=3)
+                    scoring="accuracy", cv=2)
                 clf.fit(train_X, train_y)
                 tuned_params = dict(tuned_params, **clf.best_params_)
             print(tuned_params)

@@ -32,7 +32,7 @@ def precision_recall_f1(predict_result, actual_result, POSITIVE=None):
         raise ValueError("预测正类数为0")
 
     if TP + FN == 0:
-        raise ValueError("真是正类数为0")
+        raise ValueError("真实正类数为0")
 
     return TP/(TP + FP), TP / (TP + FN), 2*TP/(2*TP+FP+FN)
 

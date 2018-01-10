@@ -5,12 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cbf1d121-fcf5-485f-822e-6ff8aab09cf0" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/ayonel/tune-serialize-model-randomforest.py" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/src/ayonel/3-clf-serialize-model.py" afterPath="$PROJECT_DIR$/src/ayonel/3-clf-serialize-model.py" />
-      <change beforePath="$PROJECT_DIR$/src/ayonel/clf.py" afterPath="$PROJECT_DIR$/src/ayonel/clf-xgboost.py" />
-      <change beforePath="$PROJECT_DIR$/src/ayonel/clf_parameter.py" afterPath="$PROJECT_DIR$/src/ayonel/tune-serialize-model-xgboost.py" />
+      <change beforePath="$PROJECT_DIR$/src/ayonel/clf-xgboost.py" afterPath="$PROJECT_DIR$/src/ayonel/clf.py" />
       <change beforePath="$PROJECT_DIR$/src/ayonel/migerate_gousios.py" afterPath="$PROJECT_DIR$/src/ayonel/migerate_gousios.py" />
+      <change beforePath="$PROJECT_DIR$/src/ayonel/tune-serialize-model-randomforest.py" afterPath="$PROJECT_DIR$/src/ayonel/tune-serialize-model-randomforest.py" />
+      <change beforePath="$PROJECT_DIR$/src/ayonel/tune-serialize-model-xgboost.py" afterPath="$PROJECT_DIR$/src/ayonel/tune-serialize-model-xgboost.py" />
+      <change beforePath="$PROJECT_DIR$/src/eval/eval_utils.py" afterPath="$PROJECT_DIR$/src/eval/eval_utils.py" />
     </list>
     <ignored path="shit.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -31,14 +31,14 @@
     <SUITE FILE_PATH="coverage/shit$5_construct_arff.coverage" NAME="5-construct_arff Coverage Results" MODIFIED="1490245440854" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/code/Gousios" />
     <SUITE FILE_PATH="coverage/DLPP$Unittest_reviewer_not_comment_dis.coverage" NAME="Unittest reviewer_not_comment_dis Coverage Results" MODIFIED="1500513199211" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/stat" />
     <SUITE FILE_PATH="coverage/DLPP$train_rnn_classify.coverage" NAME="train_rnn_classify Coverage Results" MODIFIED="1500475217320" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/code/tensorflow_text/rnn/RNN_Text_Classify-master" />
-    <SUITE FILE_PATH="coverage/DLPP$clf.coverage" NAME="clf Coverage Results" MODIFIED="1515500215748" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/ayonel" />
+    <SUITE FILE_PATH="coverage/DLPP$clf.coverage" NAME="clf Coverage Results" MODIFIED="1515550453656" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/ayonel" />
     <SUITE FILE_PATH="coverage/DLPP$train_rnn_classify__1_.coverage" NAME="train_rnn_classify (1) Coverage Results" MODIFIED="1500476054162" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/tensorflow_text/rnn/RNN_Text_Classify-master" />
     <SUITE FILE_PATH="coverage/shit$train.coverage" NAME="train Coverage Results" MODIFIED="1494399232517" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/code/tensorflow" />
     <SUITE FILE_PATH="coverage/DLPP$LoadData__1_.coverage" NAME="LoadData (1) Coverage Results" MODIFIED="1515054552550" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/gousios" />
     <SUITE FILE_PATH="coverage/DLPP$Unittests_in_Config.coverage" NAME="Unittests in Config Coverage Results" MODIFIED="1500475566896" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/tensorflow_text/rnn/RNN_Text_Classify-master" />
-    <SUITE FILE_PATH="coverage/DLPP$tune_serialize_model_randomforest.coverage" NAME="tune-serialize-model-randomforest Coverage Results" MODIFIED="1515505177647" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/ayonel" />
+    <SUITE FILE_PATH="coverage/DLPP$tune_serialize_model_randomforest.coverage" NAME="tune-serialize-model-randomforest Coverage Results" MODIFIED="1515506457458" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/ayonel" />
     <SUITE FILE_PATH="coverage/shit$Unittest_comment_token_dis.coverage" NAME="Unittest comment_token_dis Coverage Results" MODIFIED="1494396503088" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/code/stat" />
-    <SUITE FILE_PATH="coverage/DLPP$migerate_gousios.coverage" NAME="migerate_gousios Coverage Results" MODIFIED="1515504367223" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/ayonel" />
+    <SUITE FILE_PATH="coverage/DLPP$migerate_gousios.coverage" NAME="migerate_gousios Coverage Results" MODIFIED="1515513574085" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/ayonel" />
     <SUITE FILE_PATH="coverage/shit$db_test.coverage" NAME="db_test Coverage Results" MODIFIED="1490151729438" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/spider/spider" />
     <SUITE FILE_PATH="coverage/shit$2_add_month.coverage" NAME="2-add_month Coverage Results" MODIFIED="1490247772876" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/code/Gousios" />
     <SUITE FILE_PATH="coverage/DLPP$clf__2_.coverage" NAME="clf (2) Coverage Results" MODIFIED="1512553667342" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/gousios" />
@@ -64,7 +64,7 @@
     <SUITE FILE_PATH="coverage/shit$utils.coverage" NAME="utils Coverage Results" MODIFIED="1489374410872" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/spider/spider" />
     <SUITE FILE_PATH="coverage/DLPP$clf__3_.coverage" NAME="clf Coverage Results" MODIFIED="1514910847655" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/ayonel" />
     <SUITE FILE_PATH="coverage/shit$run_dbn.coverage" NAME="run_dbn Coverage Results" MODIFIED="1494404603207" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/code/Deep-Learning-TensorFlow-master/cmd_line/boltzmann" />
-    <SUITE FILE_PATH="coverage/DLPP$clf_serialize_model_1.coverage" NAME="clf-serialize-model-1 Coverage Results" MODIFIED="1515504834413" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/ayonel" />
+    <SUITE FILE_PATH="coverage/DLPP$clf_serialize_model_1.coverage" NAME="clf-serialize-model-1 Coverage Results" MODIFIED="1515542099119" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/ayonel" />
     <SUITE FILE_PATH="coverage/shit$1_cal_attributes.coverage" NAME="1-cal_attributes Coverage Results" MODIFIED="1493974135187" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/code/ayonel" />
     <SUITE FILE_PATH="coverage/shit$evaluation.coverage" NAME="evaluation Coverage Results" MODIFIED="1494399385246" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/code/eval" />
     <SUITE FILE_PATH="coverage/shit$2_pr_attr_calculation.coverage" NAME="2-pr_attr_calculation Coverage Results" MODIFIED="1489546950888" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/code/Gousios" />
@@ -98,27 +98,17 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="clf-xgboost.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/ayonel/clf-xgboost.py">
+      <file leaf-file-name="clf.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/ayonel/clf.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="421">
-              <caret line="281" column="22" lean-forward="true" selection-start-line="281" selection-start-column="22" selection-end-line="281" selection-end-column="22" />
+            <state relative-caret-position="181">
+              <caret line="268" column="33" lean-forward="false" selection-start-line="268" selection-start-column="33" selection-end-line="268" selection-end-column="33" />
               <folding>
                 <element signature="e#260#278#0" expanded="true" />
-                <element signature="e#3425#3438#0" expanded="false" />
-                <element signature="e#3520#4982#0" expanded="false" />
-                <marker date="1515505813705" expanded="true" signature="3515:10630" ph="..." />
+                <element signature="e#3467#3480#0" expanded="false" />
+                <element signature="e#3562#5024#0" expanded="false" />
+                <marker date="1515550417989" expanded="true" signature="3557:11779" ph="..." />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="4-clf-deserialize-model.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/ayonel/4-clf-deserialize-model.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="357">
-              <caret line="89" column="45" lean-forward="true" selection-start-line="87" selection-start-column="7" selection-end-line="89" selection-end-column="45" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -126,35 +116,9 @@
       <file leaf-file-name="migerate_gousios.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ayonel/migerate_gousios.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="465">
-              <caret line="40" column="5" lean-forward="true" selection-start-line="40" selection-start-column="5" selection-end-line="40" selection-end-column="5" />
+            <state relative-caret-position="395">
+              <caret line="42" column="7" lean-forward="true" selection-start-line="42" selection-start-column="7" selection-end-line="42" selection-end-column="7" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="tune-serialize-model-xgboost.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/ayonel/tune-serialize-model-xgboost.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-63">
-              <caret line="201" column="33" lean-forward="true" selection-start-line="201" selection-start-column="33" selection-end-line="201" selection-end-column="33" />
-              <folding>
-                <element signature="e#115#133#0" expanded="true" />
-                <element signature="e#3374#4836#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="tune-serialize-model-randomforest.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/ayonel/tune-serialize-model-randomforest.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="476">
-              <caret line="194" column="16" lean-forward="true" selection-start-line="194" selection-start-column="16" selection-end-line="194" selection-end-column="16" />
-              <folding>
-                <element signature="e#115#133#0" expanded="true" />
-                <element signature="e#3374#4836#0" expanded="false" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -170,7 +134,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>team_si</find>
       <find>text_code_proportion</find>
       <find>history_commit_review_time</find>
       <find>recent_3_month_commit_decay</find>
@@ -198,8 +161,9 @@
       <find>weight</find>
       <find>last_10</find>
       <find>xg</find>
-      <find>print</find>
       <find>score</find>
+      <find>cost_mat</find>
+      <find>print</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -244,7 +208,6 @@
         <option value="$PROJECT_DIR$/src/ayonel/feature_calculate/1-cal_attributes_addition.py" />
         <option value="$PROJECT_DIR$/src/ayonel/feature_calculate/1-cal_attributes_simlarity.py" />
         <option value="$PROJECT_DIR$/src/ayonel/feature_calculate/decay_feature/cal_attributes_decay.py" />
-        <option value="$PROJECT_DIR$/src/eval/eval_utils.py" />
         <option value="$PROJECT_DIR$/src/gousios/LoadData.py" />
         <option value="$PROJECT_DIR$/src/ayonel/LoadData.py" />
         <option value="$PROJECT_DIR$/venv/lib/python3.5/site-packages/imblearn/over_sampling/smote.py" />
@@ -257,11 +220,12 @@
         <option value="$PROJECT_DIR$/src/ayonel/clf_tune.py" />
         <option value="$PROJECT_DIR$/src/ayonel/3-clf-serialize-model.py" />
         <option value="$PROJECT_DIR$/src/ayonel/clf-serialize-model-1.py" />
+        <option value="$PROJECT_DIR$/src/ayonel/tune-serialize-model-randomforest.py" />
+        <option value="$PROJECT_DIR$/src/ayonel/clf-xgboost.py" />
+        <option value="$PROJECT_DIR$/src/eval/eval_utils.py" />
         <option value="$PROJECT_DIR$/src/ayonel/migerate_gousios.py" />
         <option value="$PROJECT_DIR$/src/ayonel/tune-serialize-model-xgboost.py" />
-        <option value="$PROJECT_DIR$/src/ayonel/tune-serialize-model-randomforest.py" />
         <option value="$PROJECT_DIR$/src/ayonel/clf.py" />
-        <option value="$PROJECT_DIR$/src/ayonel/clf-xgboost.py" />
       </list>
     </option>
   </component>
@@ -339,6 +303,36 @@
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="preprocess" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="DLPP" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+            </path>
+            <path>
+              <item name="DLPP" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.5.2 virtualenv at ~/PycharmProjects/DLPP/venv &gt;" type="70bed36:NamedLibraryElementNode" />
+            </path>
+            <path>
+              <item name="DLPP" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.5.2 virtualenv at ~/PycharmProjects/DLPP/venv &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="site-packages" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="DLPP" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.5.2 virtualenv at ~/PycharmProjects/DLPP/venv &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="site-packages" type="462c0819:PsiDirectoryNode" />
+              <item name="costcla" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="DLPP" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; Python 3.5.2 virtualenv at ~/PycharmProjects/DLPP/venv &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="site-packages" type="462c0819:PsiDirectoryNode" />
+              <item name="costcla" type="462c0819:PsiDirectoryNode" />
+              <item name="datasets" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
@@ -380,7 +374,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.tune-serialize-model-randomforest">
+  <component name="RunManager" selected="Python.clf">
     <configuration name="1-cal_attributes" type="PythonConfigurationType" factoryName="Python">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -451,7 +445,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="shit" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/ayonel/clf-xgboost.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/ayonel/clf.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -713,10 +707,10 @@
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.tune-serialize-model-randomforest" />
+        <item index="0" class="java.lang.String" itemvalue="Python.clf" />
         <item index="1" class="java.lang.String" itemvalue="Python.clf-serialize-model-1" />
         <item index="2" class="java.lang.String" itemvalue="Python.migerate_gousios" />
-        <item index="3" class="java.lang.String" itemvalue="Python.clf" />
+        <item index="3" class="java.lang.String" itemvalue="Python.tune-serialize-model-randomforest" />
         <item index="4" class="java.lang.String" itemvalue="Python.clf_parameter" />
       </list>
     </recent_temporary>
@@ -770,7 +764,14 @@
       <option name="project" value="LOCAL" />
       <updated>1515432170519</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="add serialize and tune for xg and rf">
+      <created>1515505847096</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1515505847096</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -816,13 +817,12 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32974428" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30706245" sideWeight="0.502442" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33981577" sideWeight="0.496337" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2958035" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" x="1478" y="51" width="795" height="751" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4544524" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" x="1478" y="51" width="795" height="751" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30706245" sideWeight="0.49713466" order="10" side_tool="false" content_ui="tabs" x="1770" y="82" width="780" height="748" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25091577" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -883,7 +883,8 @@
     <MESSAGE value="add auc each" />
     <MESSAGE value="doing cost sensitive" />
     <MESSAGE value="调整特征" />
-    <option name="LAST_COMMIT_MESSAGE" value="调整特征" />
+    <MESSAGE value="add serialize and tune for xg and rf" />
+    <option name="LAST_COMMIT_MESSAGE" value="add serialize and tune for xg and rf" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -908,14 +909,6 @@
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/tensorflow_text/cnn/TextCnnTrain.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="147">
-          <caret line="7" column="41" lean-forward="false" selection-start-line="7" selection-start-column="27" selection-end-line="7" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/spider/spider/spiders/pulltemp_spider.py" />
     <entry file="file://$PROJECT_DIR$/src/ayonel/cocos2d.csv" />
     <entry file="file://$PROJECT_DIR$/front/vue-github/LICENSE.md" />
     <entry file="file://$PROJECT_DIR$/front/vue-github/README.md" />
@@ -1046,14 +1039,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/eval/eval_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="15" column="23" lean-forward="true" selection-start-line="14" selection-start-column="4" selection-end-line="15" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/gousios/LoadData.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="357">
@@ -1099,13 +1084,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="56">
           <caret line="110" column="8" lean-forward="false" selection-start-line="110" selection-start-column="8" selection-end-line="110" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/venv/lib/python3.5/site-packages/costcla/datasets/base.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-4187">
-          <caret line="110" column="8" lean-forward="false" selection-start-line="110" selection-start-column="8" selection-end-line="110" selection-end-column="8" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1114,14 +1093,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="154">
           <caret line="7" column="10" lean-forward="false" selection-start-line="7" selection-start-column="10" selection-end-line="7" selection-end-column="10" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/venv/lib/python3.5/site-packages/xgboost-0.7-py3.5.egg/xgboost/sklearn.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="236">
-          <caret line="410" column="28" lean-forward="false" selection-start-line="410" selection-start-column="28" selection-end-line="410" selection-end-column="28" />
           <folding />
         </state>
       </provider>
@@ -1141,14 +1112,6 @@
           <folding>
             <element signature="e#115#125#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/constants.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-423">
-          <caret line="12" column="0" lean-forward="false" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1173,7 +1136,7 @@
         <state relative-caret-position="367">
           <caret line="85" column="40" lean-forward="true" selection-start-line="81" selection-start-column="11" selection-end-line="85" selection-end-column="40" />
           <folding>
-            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#0#18#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1186,18 +1149,77 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ayonel/migerate_gousios.py">
+    <entry file="file://$PROJECT_DIR$/src/ayonel/4-clf-deserialize-model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="465">
-          <caret line="40" column="5" lean-forward="true" selection-start-line="40" selection-start-column="5" selection-end-line="40" selection-end-column="5" />
+        <state relative-caret-position="1430">
+          <caret line="89" column="45" lean-forward="true" selection-start-line="87" selection-start-column="7" selection-end-line="89" selection-end-column="45" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ayonel/tune-serialize-model-randomforest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="196" column="40" lean-forward="false" selection-start-line="196" selection-start-column="40" selection-end-line="196" selection-end-column="40" />
+          <folding>
+            <element signature="e#115#133#0" expanded="false" />
+            <element signature="e#3374#4836#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/venv/lib/python3.5/site-packages/xgboost-0.7-py3.5.egg/xgboost/sklearn.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="374">
+          <caret line="401" column="47" lean-forward="false" selection-start-line="401" selection-start-column="47" selection-end-line="401" selection-end-column="47" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/eval/eval_utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="506">
+          <caret line="34" column="35" lean-forward="true" selection-start-line="34" selection-start-column="35" selection-end-line="34" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/venv/lib/python3.5/site-packages/sklearn/model_selection/_split.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="350">
+          <caret line="604" column="0" lean-forward="false" selection-start-line="604" selection-start-column="0" selection-end-line="604" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/venv/lib/python3.5/site-packages/sklearn/cross_validation.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="219">
+          <caret line="40" column="0" lean-forward="false" selection-start-line="40" selection-start-column="0" selection-end-line="40" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/venv/lib/python3.5/site-packages/costcla/datasets/base.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="585">
+          <caret line="357" column="24" lean-forward="true" selection-start-line="357" selection-start-column="20" selection-end-line="357" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/constants.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3324">
+          <caret line="12" column="0" lean-forward="false" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/ayonel/tune-serialize-model-xgboost.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-63">
-          <caret line="201" column="33" lean-forward="true" selection-start-line="201" selection-start-column="33" selection-end-line="201" selection-end-column="33" />
+        <state relative-caret-position="1310">
+          <caret line="193" column="43" lean-forward="true" selection-start-line="193" selection-start-column="43" selection-end-line="193" selection-end-column="43" />
           <folding>
             <element signature="e#115#133#0" expanded="true" />
             <element signature="e#3374#4836#0" expanded="false" />
@@ -1205,34 +1227,23 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ayonel/tune-serialize-model-randomforest.py">
+    <entry file="file://$PROJECT_DIR$/src/ayonel/migerate_gousios.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="476">
-          <caret line="194" column="16" lean-forward="true" selection-start-line="194" selection-start-column="16" selection-end-line="194" selection-end-column="16" />
-          <folding>
-            <element signature="e#115#133#0" expanded="true" />
-            <element signature="e#3374#4836#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ayonel/4-clf-deserialize-model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="89" column="45" lean-forward="true" selection-start-line="87" selection-start-column="7" selection-end-line="89" selection-end-column="45" />
+        <state relative-caret-position="395">
+          <caret line="42" column="7" lean-forward="true" selection-start-line="42" selection-start-column="7" selection-end-line="42" selection-end-column="7" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ayonel/clf-xgboost.py">
+    <entry file="file://$PROJECT_DIR$/src/ayonel/clf.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="421">
-          <caret line="281" column="22" lean-forward="true" selection-start-line="281" selection-start-column="22" selection-end-line="281" selection-end-column="22" />
+        <state relative-caret-position="181">
+          <caret line="268" column="33" lean-forward="false" selection-start-line="268" selection-start-column="33" selection-end-line="268" selection-end-column="33" />
           <folding>
             <element signature="e#260#278#0" expanded="true" />
-            <element signature="e#3425#3438#0" expanded="false" />
-            <element signature="e#3520#4982#0" expanded="false" />
-            <marker date="1515505813705" expanded="true" signature="3515:10630" ph="..." />
+            <element signature="e#3467#3480#0" expanded="false" />
+            <element signature="e#3562#5024#0" expanded="false" />
+            <marker date="1515550417989" expanded="true" signature="3557:11779" ph="..." />
           </folding>
         </state>
       </provider>

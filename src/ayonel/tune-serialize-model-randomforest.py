@@ -154,7 +154,7 @@ def run_monthly(client, MonthGAP=1):
     data_dict, pullinfo_list_dict = load_data_monthly(ayonel_numerical_attr=ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
                                   ayonel_categorical_attr_handler=ayonel_categorical_attr_handler, MonthGAP=MonthGAP)
 
-    for org, repo in org_list:
+    for org, repo in [('dimagi', 'xxx')]:
         print(org+",")
         pullinfo_list = pullinfo_list_dict[org]
         batch_iter = data_dict[org]
@@ -178,7 +178,6 @@ def run_monthly(client, MonthGAP=1):
                 ("min_weight_fraction_leaf", iandfrange(0, 0.501, 0.05)),
                 ("oob_score", [True, False]),
             ]
-
             tuned_params = {}  # 已调好的参数
             for k, v in enumerate(parameters):
                 tuning_param = {}
