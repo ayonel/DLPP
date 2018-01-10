@@ -146,6 +146,7 @@ def run(client, clf, print_prf=False, print_main_proportion=False):
         train(clf, train_X, train_y)
         accuracy = clf.score(test_X, test_y)
         ACC += accuracy
+
         predict_result = clf.predict(test_X).tolist()
         actual_result = test_y.tolist()
         precision, recall, F1 = precision_recall_f1(predict_result, actual_result)
@@ -161,7 +162,7 @@ def run(client, clf, print_prf=False, print_main_proportion=False):
 
 # 按月训练
 @mongo
-def run_monthly(client, model, deserialize = False, print_prf=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1, persistence=False):
+def run_monthly(client, model, deserialize=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1, persistence=False):
     data_dict, pullinfo_list_dict = load_data_monthly(ayonel_numerical_attr=ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
                                   ayonel_categorical_attr_handler=ayonel_categorical_attr_handler, MonthGAP=MonthGAP)
 
@@ -190,11 +191,11 @@ def run_monthly(client, model, deserialize = False, print_prf=False, print_prf_e
             clf = None
             if deserialize:
                 if model == "xgboost":
-                    parameters = client[org]['model'].find_one({'model': 'xgboost', 'round':round, 'gap': MonthGAP}, {'_id': 0, 'model': 0, 'gap': 0})
+                    parameters = client[org]['model'].find_one({'model': 'xgboost', 'round':round, 'gap': MonthGAP}, {'_id': 0, 'model': 0, 'gap': 0, 'round': 0})
                     clf = XGBClassifier(seed=RANDOM_SEED, **parameters)
                     train(clf, train_X, train_y)
                 elif model == 'randomforest':
-                    parameters = client[org]['model'].find_one({'model': 'randomforest', 'round': round, 'gap': MonthGAP}, {'_id': 0, 'model': 0, 'gap': 0})
+                    parameters = client[org]['model'].find_one({'model': 'randomforest', 'round': round, 'gap': MonthGAP}, {'_id': 0, 'model': 0, 'gap': 0, 'round': 0})
                     clf = RandomForestClassifier(random_state=RANDOM_SEED, **parameters)
                     train(clf, train_X, train_y)
                 else:
@@ -272,7 +273,6 @@ def run_monthly(client, model, deserialize = False, print_prf=False, print_prf_e
         # print(predict_result)
         # print(actual_result)
 
-
         if print_prf_each:
             merged_precision, merged_recall, merged_F1 = precision_recall_f1(predict_result, actual_result, POSITIVE=0)
             rejected_precision, rejected_recall, rejected_F1 = precision_recall_f1(predict_result, actual_result, POSITIVE=1)
@@ -299,7 +299,7 @@ if __name__ == '__main__':
     # model = 'randomforest'
     # clf = RandomForestClassifier(random_state=RANDOM_SEED, class_weight='balanced_subsample')
     # clf = CostSensitiveBaggingClassifier()
-    run_monthly(model, deserialize=True, print_prf=False, print_prf_each=True, print_main_proportion=False, print_AUC=True, MonthGAP=6, persistence=False)
+    run_monthly(model, deserialize=True, print_prf_each=True, print_main_proportion=False, print_AUC=True, MonthGAP=6, persistence=False)
 
     # run(XGBClassifier(seed=RANDOM_SEED))
 

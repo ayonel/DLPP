@@ -24,27 +24,30 @@ def migerate(client):
             client[org]['ayonel'].update({'number': attr['number']}, {'$set': data}, upsert=True)
 
 if __name__ == '__main__':
-    from sklearn.model_selection import GridSearchCV
-    from sklearn.ensemble import RandomForestClassifier
-    from xgboost import XGBClassifier
-    from costcla.models import CostSensitiveRandomForestClassifier
-    import numpy as np
-    X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-    y = np.array([1, 1, 0, 1])
-    # est = XGBClassifier()
-    # params = {
-    #     'learning_rate': [0.5, 0, 1]
-    # }
-    # clf = GridSearchCV(
-    #     estimator=est,
-    #     param_grid=params,
-    #     scoring="accuracy",
-    #     cv=2
-    # )
-    # clf.fit(X, y)
-    clf = CostSensitiveRandomForestClassifier()
-    clf.fit(X, y, np.array([[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]))
+    # from sklearn.model_selection import GridSearchCV
+    # from sklearn.ensemble import RandomForestClassifier
+    # from xgboost import XGBClassifier
+    # from costcla.models import CostSensitiveRandomForestClassifier
+    # import numpy as np
+    # X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+    # y = np.array([1, 1, 0, 1])
+    # # est = XGBClassifier()
+    # # params = {
+    # #     'learning_rate': [0.5, 0, 1]
+    # # }
+    # # clf = GridSearchCV(
+    # #     estimator=est,
+    # #     param_grid=params,
+    # #     scoring="accuracy",
+    # #     cv=2
+    # # )
+    # # clf.fit(X, y)
+    # clf = CostSensitiveRandomForestClassifier()
+    # clf.fit(X, y, np.array([[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]))
+    #
+    # # clf = RandomForestClassifier()
+    # # clf.fit(X,y)
+    # print(clf.predict(np.array([[0,0],[1,0]])))
 
-    # clf = RandomForestClassifier()
-    # clf.fit(X,y)
-    print(clf.predict(np.array([[0,0],[1,0]])))
+    for org, repo in org_list:
+        print("mongoimport -d " + org +" -c model --upsert " + org)
