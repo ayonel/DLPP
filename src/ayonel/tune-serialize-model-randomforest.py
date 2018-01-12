@@ -50,7 +50,6 @@ ayonel_numerical_attr = [
     'commits',
     'history_commit_num',
     'files_changes',
-    'inline_comment_num',
     'commits_files_touched',
     'history_commit_passrate',
 
