@@ -130,7 +130,7 @@ def run(client, clf, print_prf=False, print_main_proportion=False):
     attr_dict, label_dict, pullinfo_list_dict = load_data(ayonel_numerical_attr=ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
                                   ayonel_categorical_attr_handler=ayonel_categorical_attr_handler)
     ACC = 0.0
-    for org, repo in org_list:
+    for org, repo in [('angular','xxx')]:
         input_X = attr_dict[org]
         input_y = label_dict[org]
         seg_point = int(len(input_X) * SEG_PROPORTION)
@@ -163,7 +163,7 @@ def run(client, clf, print_prf=False, print_main_proportion=False):
 
 # 按月训练
 @mongo
-def run_monthly(client, model, deserialize=False, over_sample=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1, persistence=False):
+def run_monthly(client, model, thred=0.5, deserialize=False, over_sample=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1, persistence=False):
     data_dict, pullinfo_list_dict = load_data_monthly(ayonel_numerical_attr=ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
                                   ayonel_categorical_attr_handler=ayonel_categorical_attr_handler, MonthGAP=MonthGAP)
 
@@ -209,19 +209,8 @@ def run_monthly(client, model, deserialize=False, over_sample=False, print_prf_e
             raise RuntimeError("分类器初始化失败")
         return clf
 
-    thred_dict = {}
-    for thred in iandfrange(0.05, 1.0, 0.05):
-        thred_dict[thred] = {}
-        thred_dict[thred]['acc'] = []
-        thred_dict[thred]['F1(M)'] = []
-        thred_dict[thred]['P(M)'] = []
-        thred_dict[thred]['R(M)'] = []
-        thred_dict[thred]['F1(R)'] = []
-        thred_dict[thred]['P(R)'] = []
-        thred_dict[thred]['R(R)'] = []
-
     for org, repo in org_list:
-        # print(org+",", end='')
+        print(org+",", end='')
         pullinfo_list = pullinfo_list_dict[org]
         batch_iter = data_dict[org]
         train_batch = batch_iter.__next__()
@@ -272,7 +261,6 @@ def run_monthly(client, model, deserialize=False, over_sample=False, print_prf_e
                 #     train(clf, train_X, train_y)
                 # else:
                 train(clf, train_X, train_y)
-                # print(clf.score(test_X, test_y))
             actual_result += test_y.tolist()  # 真实结果
             predict_result += clf.predict(test_X).tolist()  # 预测结果
             predict_result_prob += [x[0] for x in clf.predict_proba(test_X).tolist()]
@@ -282,72 +270,55 @@ def run_monthly(client, model, deserialize=False, over_sample=False, print_prf_e
             round += 1
 
         # 开始输出结果
-        for thred in iandfrange(0.05, 1.0, 0.05):
-            for k, pre in enumerate(predict_result_prob):
-                if pre <= thred:
-                    predict_result[k] = 1
-                else:
-                    predict_result[k] = 0
+        for k, pre in enumerate(predict_result_prob):
+            if pre <= thred:
+                predict_result[k] = 1
+            else:
+                predict_result[k] = 0
 
-            # print(str(thred)+",", end='')
-            acc_num = 0
-            for i in range(len(actual_result)):
-                if actual_result[i] == predict_result[i]:
-                    acc_num += 1
-            # 需要将结果入库
-            if persistence:
-                for i in range(len(predict_result)):
-                    number = int(pullinfo_list[cursor + i]['number'])
-                    data = {
-                        'number':           number,
-                        'org':              org,
-                        'repo':             repo,
-                        'created_at':       float(pullinfo_list[cursor + i]['created_at']),
-                        'closed_at':        float(pullinfo_list[cursor + i]['closed_at']),
-                        'title':            pullinfo_list[cursor + i]['title'],
-                        'submitted_by':     pullinfo_list[cursor + i]['author'],
-                        'merged':           pullinfo_list[cursor + i]['merged'],
-                        'predict_merged':   True if predict_result[i] == 0 else False
-                    }
+        # print(str(thred)+",", end='')
+        acc_num = 0
+        for i in range(len(actual_result)):
+            if actual_result[i] == predict_result[i]:
+                acc_num += 1
+        # 需要将结果入库
+        if persistence:
+            for i in range(len(predict_result)):
+                number = int(pullinfo_list[cursor + i]['number'])
+                data = {
+                    'number':           number,
+                    'org':              org,
+                    'repo':             repo,
+                    'created_at':       float(pullinfo_list[cursor + i]['created_at']),
+                    'closed_at':        float(pullinfo_list[cursor + i]['closed_at']),
+                    'title':            pullinfo_list[cursor + i]['title'],
+                    'submitted_by':     pullinfo_list[cursor + i]['author'],
+                    'merged':           pullinfo_list[cursor + i]['merged'],
+                    'predict_merged':   True if predict_result[i] == 0 else False
+                }
 
-                    client[persistence_db][persistence_col].insert(data)
+                client[persistence_db][persistence_col].insert(data)
 
-            # print(acc_num / len(actual_result), end='')
-            thred_dict[thred]['acc'].append(acc_num / len(actual_result))
+        print(acc_num / len(actual_result), end='')
 
-            if print_prf_each:
-                merged_precision, merged_recall, merged_F1 = precision_recall_f1(predict_result, actual_result, POSITIVE=0)
-                thred_dict[thred]['P(M)'] = merged_precision
-                thred_dict[thred]['R(M)'] = merged_recall
-                thred_dict[thred]['F1(M)'] = merged_F1
-                rejected_precision, rejected_recall, rejected_F1 = precision_recall_f1(predict_result, actual_result, POSITIVE=1)
-                thred_dict[thred]['P(R)'] = rejected_precision
-                thred_dict[thred]['R(R)'] = rejected_recall
-                thred_dict[thred]['F1(R)'] = rejected_F1
-
-                print(',%f,%f,%f,%f,%f,%f' % (merged_F1, merged_precision, merged_recall, rejected_F1,rejected_precision, rejected_recall ), end='')
+        if print_prf_each:
+            merged_precision, merged_recall, merged_F1 = precision_recall_f1(predict_result, actual_result, POSITIVE=0)
+            rejected_precision, rejected_recall, rejected_F1 = precision_recall_f1(predict_result, actual_result, POSITIVE=1)
+            print(',%f,%f,%f,%f,%f,%f' % (merged_F1, merged_precision, merged_recall, rejected_F1,rejected_precision, rejected_recall ), end='')
 
 
-            if print_main_proportion:
-                main_proportion = predict_result.count(1) / len(predict_result)
-                print(',%f' % (main_proportion if main_proportion > 0.5 else 1 - main_proportion), end='')
+        if print_main_proportion:
+            main_proportion = predict_result.count(1) / len(predict_result)
+            print(',%f' % (main_proportion if main_proportion > 0.5 else 1 - main_proportion), end='')
 
-            if print_AUC:
-                y = np.array(actual_result)
-                pred = np.array(predict_result_prob)
-                fpr, tpr, thresholds = roc_curve(y, pred)
-                AUC = auc(fpr, tpr)
-                thred_dict[thred]['AUC'] = AUC
-                print(',%f' % (AUC if AUC > 0.5 else 1 - AUC), end='')
-            print()
+        if print_AUC:
+            y = np.array(actual_result)
+            pred = np.array(predict_result_prob)
+            fpr, tpr, thresholds = roc_curve(y, pred)
+            AUC = auc(fpr, tpr)
+            print(',%f' % (AUC if AUC > 0.5 else 1 - AUC), end='')
+        print()
 
-    for thred in thred_dict:
-        string = ''
-        for index in ['acc','F1(M)','P(M)','R(M)','F1(R)','P(R)','R(R)','AUC']:
-            string += str(thred)
-            a = sum(thred_dict[thred][index])
-            string += ','+str(a/len(org_list))
-        print(string)
 
 if __name__ == '__main__':
 
@@ -357,6 +328,7 @@ if __name__ == '__main__':
     # clf = RandomForestClassifier(random_state=RANDOM_SEED, class_weight='balanced_subsample')
     # clf = CostSensitiveBaggingClassifier()
     run_monthly(model,
+                thred=0.65,
                 deserialize=False,
                 over_sample=False,
                 print_prf_each=True,
