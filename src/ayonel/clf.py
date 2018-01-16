@@ -61,33 +61,27 @@ ayonel_numerical_attr = [
     'commits',
     'history_commit_num',
     'files_changes',
-    # 'inline_comment_num',
     'commits_files_touched',
     'history_commit_passrate',
-
-    # 后来补充
     'src_addition',
-    'pr_file_rejected_count',
+
     'team_size',
-    'src_deletion',  # 降
-    'pr_file_rejected_proportion',  # 降
-    'src_churn',
-    'text_code_proportion',
-    'pr_file_merged_count_decay',
-    'history_pr_num_decay',  # 降
-    'pr_file_submitted_count_decay',
+    'pr_file_rejected_proportion',
 
-    # 后来补充稍差
+    # # 淘汰
+    # 'pr_file_rejected_count',
+    # 'src_deletion',
+    # 'src_churn',
+    # 'text_code_proportion',
     # 'history_commit_review_time',
-    # 'recent_1_month_project_pr_num',  # 降
-    # 'pr_file_merged_count',  # 降 17
-    # 'pr_file_submitted_count',  # 降
-    # 'recent_3_month_project_pr_num',  # 降
-    # 'recent_3_month_pr',  # 降 21
-    # 'pr_file_merged_proportion',  # 降
+    # 'recent_1_month_project_pr_num',
+    # 'pr_file_merged_count',
+    # 'pr_file_submitted_count',
+    # 'recent_3_month_project_pr_num',
+    # 'recent_3_month_pr',
+    # 'pr_file_merged_proportion',
     # 'recent_3_month_commit',
-    # 'recent_project_passrate',  # 降26
-
+    # 'recent_project_passrate',
 
     # 太差
     # 'pr_file_rejected_count_decay',
@@ -328,7 +322,7 @@ if __name__ == '__main__':
     # clf = RandomForestClassifier(random_state=RANDOM_SEED, class_weight='balanced_subsample')
     # clf = CostSensitiveBaggingClassifier()
     run_monthly(model,
-                thred=0.65,
+                thred=0.5,
                 deserialize=False,
                 over_sample=False,
                 print_prf_each=True,

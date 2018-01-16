@@ -43,70 +43,8 @@ from costcla.models import CostSensitiveBaggingClassifier
 SEG_PROPORTION = 8/10
 FOLDS = 5
 # 按重要性排序之后的
-ayonel_numerical_attr = [
-    'last_10_pr_rejected',
-    'history_pass_pr_num',
-    'last_10_pr_merged',
-    'commits',
-    'history_commit_num',
-    'files_changes',
-    'commits_files_touched',
-    'history_commit_passrate',
 
-    # 后来补充
-    'src_addition',
-    'pr_file_rejected_count',
-    'team_size',
-    'src_deletion',  # 降
-    'pr_file_rejected_proportion',  # 降
-    'src_churn',
-    'text_code_proportion',
-    'pr_file_merged_count_decay',
-    'history_pr_num_decay',  # 降
-    'pr_file_submitted_count_decay',
-
-    # 后来补充稍差
-    # 'history_commit_review_time',
-    # 'recent_1_month_project_pr_num',  # 降
-    # 'pr_file_merged_count',  # 降 17
-    # 'pr_file_submitted_count',  # 降
-    # 'recent_3_month_project_pr_num',  # 降
-    # 'recent_3_month_pr',  # 降 21
-    # 'pr_file_merged_proportion',  # 降
-    # 'recent_3_month_commit',
-    # 'recent_project_passrate',  # 降26
-
-
-    # 太差
-    # 'pr_file_rejected_count_decay',
-    # 'perc_ext_contribs',  # 降 29
-    # 'body_similarity_merged',
-    # 'title_similarity_rejected', # 降32
-    # 'recent_3_month_project_pr_num_decay', # 降34
-    # 'title_similarity_merged',
-    # 'last_10_pr_merged_decay',# 降
-    # 'recent_1_month_project_pr_num_decay',# 降
-    # 'body_similarity_rejected',# 降 38
-    # 'file_similarity_merged',
-    # 'text_similarity_merged',
-    # 'file_similarity_rejected',# 降 38
-    # 'text_similarity_rejected',# 降 38
-    # 'last_10_pr_rejected_decay',
-
-]
-
-
-ayonel_boolean_attr = [
-    'is_reviewer_commit',
-    # 'has_test',
-    'text_forward_link',
-    'last_pr',
-    # 'has_body',
-]
-
-ayonel_categorical_attr_handler = [
-    ('week', week_handler)
-]
+from src.ayonel.clf import ayonel_boolean_attr, ayonel_numerical_attr, ayonel_categorical_attr_handler
 
 def train(clf, X, y):
     clf.fit(X, y)
@@ -153,7 +91,7 @@ def run_monthly(client, MonthGAP=1):
     data_dict, pullinfo_list_dict = load_data_monthly(ayonel_numerical_attr=ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
                                   ayonel_categorical_attr_handler=ayonel_categorical_attr_handler, MonthGAP=MonthGAP)
 
-    for org, repo in [('dimagi','xxx')]:
+    for org, repo in org_list:
         print(org+",")
         pullinfo_list = pullinfo_list_dict[org]
         batch_iter = data_dict[org]
