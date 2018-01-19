@@ -128,7 +128,7 @@ def run(client, clf, print_prf=False, print_main_proportion=False):
     attr_dict, label_dict, pullinfo_list_dict = load_data(ayonel_numerical_attr=ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
                                   ayonel_categorical_attr_handler=ayonel_categorical_attr_handler)
     ACC = 0.0
-    for org, repo in [('angular','xxx')]:
+    for org, repo in org_list:
         input_X = attr_dict[org]
         input_y = label_dict[org]
         seg_point = int(len(input_X) * SEG_PROPORTION)
@@ -183,7 +183,6 @@ def run_monthly(client, models, thred=0.5, deserialize=False, over_sample=False,
     # 初始化分类器
     def _init_classifier(models, deserialize, org, round, MonthGAP):
         clf_list = []
-
         for model_name, weight in models.items():
             if deserialize:
                 if model_name == "xgboost":  # 'scale_pos_weight'此参数不要用于初始化模型
@@ -191,7 +190,6 @@ def run_monthly(client, models, thred=0.5, deserialize=False, over_sample=False,
                                                                {'_id': 0, 'model': 0, 'gap': 0, 'round': 0, 'scale_pos_weight':0})
                     clf = XGBClassifier(seed=RANDOM_SEED, **parameters)
                     clf_list.append((clf, weight))
-
                 elif model_name == 'randomforest':
                     parameters = client[org]['model'].find_one({'model': 'randomforest', 'round': round, 'gap': MonthGAP},
                                                                {'_id': 0, 'model': 0, 'gap': 0, 'round': 0})
@@ -209,8 +207,15 @@ def run_monthly(client, models, thred=0.5, deserialize=False, over_sample=False,
                 elif model_name == 'costsensitiverandomforest':
                     clf = CostSensitiveBaggingClassifier()
                     clf_list.append((clf, weight))
+                elif model_name == 'svm':
+                    clf = SVC(probability=True)
+                    clf_list.append((clf, weight))
+                elif model_name == 'bayes':
+                    clf = GaussianNB()
+                    clf_list.append((clf, weight))
                 else:
                     raise RuntimeError("请指定分类器")
+                clf_list.append((clf, weight))
 
             if clf_list == [] or clf_list.__contains__(None):
                 raise RuntimeError("分类器初始化失败")
@@ -334,7 +339,9 @@ if __name__ == '__main__':
 
     # model = 'costsensitiverandodeserializemforest'
     models = {
-        'xgboost': 1.0,
+        'xgboost': 0.7,
+        'svm': 0.3,
+
     }
     # model = 'randomforest'
     # clf = RandomForestClassifier(random_state=RANDOM_SEED, class_weight='balanced_subsample')
@@ -343,7 +350,7 @@ if __name__ == '__main__':
                 thred=0.5,
                 deserialize=False,
                 over_sample=False,
-                print_prf_each=True,
+                print_prf_each=False,
                 print_main_proportion=False,
                 print_AUC=True,
                 MonthGAP=6,
