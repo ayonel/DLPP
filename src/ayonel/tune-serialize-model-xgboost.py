@@ -91,7 +91,7 @@ def run_monthly(client, MonthGAP=1):
     data_dict, pullinfo_list_dict = load_data_monthly(ayonel_numerical_attr=ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
                                   ayonel_categorical_attr_handler=ayonel_categorical_attr_handler, MonthGAP=MonthGAP)
 
-    for org, repo in org_list:
+    for org, repo in [('Baystation12','xx')]:
         print(org+",")
         pullinfo_list = pullinfo_list_dict[org]
         batch_iter = data_dict[org]
@@ -130,7 +130,7 @@ def run_monthly(client, MonthGAP=1):
                 clf = GridSearchCV(
                     estimator=estimator_xg,
                     param_grid=tuning_param,
-                    scoring="accuracy", cv=2)
+                    scoring="roc_auc", cv=5)
                 clf.fit(train_X, train_y)
                 tuned_params = dict(tuned_params, **clf.best_params_)
             print(tuned_params)

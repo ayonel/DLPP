@@ -35,7 +35,7 @@ if __name__ == '__main__':
     # # params = {
     # #     'learning_rate': [0.5, 0, 1]
     # # }
-    # # clf = GridSearchCV(
+    # # clf = Gr idSearchCV(
     # #     estimator=est,
     # #     param_grid=params,
     # #     scoring="accuracy",

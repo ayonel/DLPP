@@ -45,24 +45,26 @@ FOLDS = 5
 # 按重要性排序之后的
 # 确定之后的
 ayonel_numerical_attr = [
-    'last_10_pr_rejected',
-    'history_pass_pr_num',
-    'last_10_pr_merged',
-    'commits',
-    'history_commit_num',
-    'files_changes',
-    'commits_files_touched',
     'history_commit_passrate',
-    'src_addition',
-    'team_size',
-    'pr_file_rejected_proportion',
+    # 'commits_files_touched',
+    # 'last_10_pr_rejected',
+    # 'commits',
+    # 'files_changes',
+    #
+    # 'last_10_pr_merged',
+    # 'src_churn',
+    # 'pr_file_rejected_proportion',
+    # 'src_addition',
+    # 'history_pr_num_decay',
+    # 'team_size',
+    # 'src_deletion',
+
 ]
 
-
 to_add = [
+    'history_pass_pr_num',
+    'history_commit_num',
     'pr_file_rejected_count',
-    'src_deletion',
-    'src_churn',
     'text_code_proportion',
     'history_commit_review_time',
     'recent_1_month_project_pr_num',
@@ -73,6 +75,8 @@ to_add = [
     'pr_file_merged_proportion',
     'recent_3_month_commit',
     'recent_project_passrate',
+    'pr_file_merged_count_decay',
+    'pr_file_submitted_count_decay',
 
 ]
 
@@ -86,7 +90,7 @@ ayonel_boolean_attr = [
 ]
 
 ayonel_categorical_attr_handler = [
-    ('week', week_handler)
+    # ('week', week_handler)
 ]
 
 
@@ -227,18 +231,20 @@ def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_p
         #     main_proportion = predict_result.count(1) / len(predict_result)
         #     print(',%f' % (main_proportion if main_proportion > 0.5 else 1 - main_proportion), end='')
         #
-        # if print_AUC:
-        #     y = np.array(actual_result)
-        #     pred = np.array(predict_result_prob)
-        #     fpr, tpr, thresholds = roc_curve(y, pred)
-        #     AUC = auc(fpr, tpr)
-        #     print(',%f' % (AUC if AUC > 0.5 else 1 - AUC), end='')
+        AUC = 0.0
+        if print_AUC:
+            y = np.array(actual_result)
+            pred = np.array(predict_result_prob)
+            fpr, tpr, thresholds = roc_curve(y, pred)
+            AUC = auc(fpr, tpr)
+            print(',%f' % (AUC if AUC > 0.5 else 1 - AUC), end='')
         # print()
-    return accuracy/len(org_list)
+    return accuracy/len(org_list), AUC
 
 
 if __name__ == '__main__':
-    base = 0.820484012
+    base = 0.8230396499494876
+
 
 
     clf = XGBClassifier(seed=RANDOM_SEED)
@@ -246,8 +252,8 @@ if __name__ == '__main__':
     # clf = CostSensitiveBaggingClassifier()
 
     for k,param in enumerate(to_add):
-        accuracy = run_monthly(clf, print_prf=False, print_prf_each=True, print_main_proportion=False, print_AUC=True, MonthGAP=6, persistence=False, ayonel_numerical_attr=ayonel_numerical_attr+[param])
+        accuracy, AUC = run_monthly(clf, print_prf=False, print_prf_each=True, print_main_proportion=False, print_AUC=True, MonthGAP=6, persistence=False, ayonel_numerical_attr=ayonel_numerical_attr+[param])
         if accuracy > base:
-            print(param+','+str(accuracy))
+            print(param+','+str(accuracy)+','+str(AUC))
 
     # run(XGBClassifier(seed=RANDOM_SEED))
