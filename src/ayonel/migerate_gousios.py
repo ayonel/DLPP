@@ -49,5 +49,12 @@ if __name__ == '__main__':
     # # clf.fit(X,y)
     # print(clf.predict(np.array([[0,0],[1,0]])))
 
-    for org, repo in org_list:
-        print("mongoimport -d " + org +" -c model --upsert " + org)
+    # for org, repo in org_list:
+    #     print("mongoimport -d " + org +" -c model --upsert " + org)
+
+
+    client = get_connection()
+    attr = client['Baystation12']['ayonel'].find_one()
+    for k in attr:
+        print(k)
+

@@ -36,7 +36,8 @@ org_list = [
     ('zendframework', 'zendframework'),
 
     #-----------以下为极为不平衡的6个项目-----------
-    # ('apache', 'spark'),
+    ('apache', 'spark'),
+
     ('nodejs', 'node-v0.x-archive'),
     ('angular', 'angular.js'),
     ('Wikia', 'app'),

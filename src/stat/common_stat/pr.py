@@ -6,7 +6,6 @@
  E-mail: ayonel@qq.com
  统计每个项目PR数以及每天产生的pr数
 '''
-
 from src.database.dbutil import *
 from src.constants import *
 import csv
@@ -57,5 +56,43 @@ def check(client):
     print(len(ayonel_set&gousios_set))
 
 
+@mongo
+def comment(client):
+    comment_num_list = []
+    for org, repo in org_list:
+        comment_num_list.append(client[org]['pullcomment'].find().count())
+
+    print(sum(comment_num_list))
+    print(sorted(comment_num_list))
+
+import requests
+import json
+def star():
+    star_num_list = []
+    for org, repo in org_list:
+        star_num = json.loads(requests.get('https://api.github.com/repos/'+org+'/'+repo).text)['stargazers_count']
+        print(org+','+str(star_num))
+        star_num_list.append(star_num)
+    print(sum(star_num_list))
+    print(sorted(star_num_list))
+
+from collections import Counter
+def language():
+    lan_list = []
+    for org, repo in org_list:
+        lan_dict = json.loads(requests.get('https://api.github.com/repos/'+org+'/'+repo+'/languages?access_token=a2c8a20da495eb45b56710a459f12f1a5b34577e').text)
+        max = 0
+        for lan in lan_dict:
+            if int(lan_dict[lan]) > max:
+                max = int(lan_dict[lan])
+
+        print(str(lan_dict)+','+org+'/'+repo)
+        for lan in lan_dict:
+            if lan_dict[lan] == max:
+                lan_list.append(lan)
+                print(org+','+lan)
+                break
+    counter = Counter(lan_list)
+    print(counter)
 if __name__ == '__main__':
-    check()
+    language()
