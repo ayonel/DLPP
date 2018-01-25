@@ -1,4 +1,4 @@
-ROOT_PATH = "/Users/dimera/PycharmProjects/DLPP"
+ROOT_PATH = "F:/DLPP"
 GOUSIOS_DATA_PATH = ROOT_PATH+'/data/gousios_new'
 GOUSIOS_CODE_PATH = ROOT_PATH+'/src/gousios'
 
@@ -36,8 +36,7 @@ org_list = [
     ('zendframework', 'zendframework'),
 
     #-----------以下为极为不平衡的6个项目-----------
-    ('apache', 'spark'),
-
+    # ('apache', 'spark'),
     ('nodejs', 'node-v0.x-archive'),
     ('angular', 'angular.js'),
     ('Wikia', 'app'),

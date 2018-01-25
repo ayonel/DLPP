@@ -54,64 +54,98 @@ from sklearn.metrics import roc_auc_score
 SEG_PROPORTION = 8/10
 FOLDS = 5
 # 按重要性排序之后的
+# ayonel_numerical_attr = [
+#     'history_commit_passrate',
+#     'commits_files_touched',
+#     # 'last_10_pr_rejected',
+#     'commits',
+#     'files_changes',
+#
+#     'last_10_pr_merged',
+#     'src_churn',
+#     'pr_file_rejected_proportion',
+#     'src_addition',
+#     'history_pr_num_decay',
+#     'team_size',
+#     'src_deletion',
+#
+#
+#     # # 淘汰
+#     # 'pr_file_merged_count_decay',
+#     # 'pr_file_submitted_count_decay'
+#     # 'pr_file_rejected_count',
+#     # 'src_deletion',
+#     # 'src_churn',
+#     # 'text_code_proportion',
+#     # 'history_commit_review_time',
+#     # 'recent_1_month_project_pr_num',
+#     # 'pr_file_merged_count',
+#     # 'pr_file_submitted_count',
+#     # 'recent_3_month_project_pr_num',
+#     # 'recent_3_month_pr',
+#     # 'pr_file_merged_proportion',
+#     # 'recent_3_month_commit',
+#     # 'recent_project_passrate',
+#
+#     # 太差
+#     # 'pr_file_rejected_count_decay',
+#     # 'perc_ext_contribs',  # 降 29
+#     # 'body_similarity_merged',
+#     # 'title_similarity_rejected', # 降32
+#     # 'recent_3_month_project_pr_num_decay', # 降34
+#     # 'title_similarity_merged',
+#     # 'last_10_pr_merged_decay',# 降
+#     # 'recent_1_month_project_pr_num_decay',# 降
+#     # 'body_similarity_rejected',# 降 38
+#     # 'file_similarity_merged',
+#     # 'text_similarity_merged',
+#     # 'file_similarity_rejected',# 降 38
+#     # 'text_similarity_rejected',# 降 38
+#     # 'last_10_pr_rejected_decay',
+#
+# ]
+
 ayonel_numerical_attr = [
-    'history_commit_passrate',
     'commits_files_touched',
-    # 'last_10_pr_rejected',
+    'perc_ext_contribs',
+    'team_size',
+    'sloc',
+    'test_lines_per_kloc',
     'commits',
     'files_changes',
-
-    'last_10_pr_merged',
     'src_churn',
+    'test_churn',
+    'history_commit_num',
+    'history_commit_passrate',
+    'file_similarity_merged',
+    'file_similarity_rejected',
+    'text_similarity_merged',
+    'text_similarity_rejected',
+    'last_10_pr_merged',
+    'last_10_pr_rejected',
+    'pr_file_merged_count',
+    'pr_file_merged_proportion',
+    'pr_file_rejected_count',
     'pr_file_rejected_proportion',
+    'pr_file_submitted_count',
+    'recent_3_month_commit',
+    'recent_3_month_project_pr_num',
+    'recent_project_passrate',
     'src_addition',
-    'history_pr_num_decay',
-    'team_size',
     'src_deletion',
-
-
-    # # 淘汰
-    # 'pr_file_merged_count_decay',
-    # 'pr_file_submitted_count_decay'
-    # 'pr_file_rejected_count',
-    # 'src_deletion',
-    # 'src_churn',
-    # 'text_code_proportion',
-    # 'history_commit_review_time',
-    # 'recent_1_month_project_pr_num',
-    # 'pr_file_merged_count',
-    # 'pr_file_submitted_count',
-    # 'recent_3_month_project_pr_num',
-    # 'recent_3_month_pr',
-    # 'pr_file_merged_proportion',
-    # 'recent_3_month_commit',
-    # 'recent_project_passrate',
-
-    # 太差
-    # 'pr_file_rejected_count_decay',
-    # 'perc_ext_contribs',  # 降 29
-    # 'body_similarity_merged',
-    # 'title_similarity_rejected', # 降32
-    # 'recent_3_month_project_pr_num_decay', # 降34
-    # 'title_similarity_merged',
-    # 'last_10_pr_merged_decay',# 降
-    # 'recent_1_month_project_pr_num_decay',# 降
-    # 'body_similarity_rejected',# 降 38
-    # 'file_similarity_merged',
-    # 'text_similarity_merged',
-    # 'file_similarity_rejected',# 降 38
-    # 'text_similarity_rejected',# 降 38
-    # 'last_10_pr_rejected_decay',
-
+    'text_code_proportion',
+    'history_commit_review_time',
+    'history_pass_pr_num'
 ]
+
 
 
 ayonel_boolean_attr = [
     'is_reviewer_commit',
-    # 'has_test',
+    'has_test',
     'text_forward_link',
     'last_pr',
-    # 'has_body',
+    'has_body',
 ]
 
 ayonel_categorical_attr_handler = [

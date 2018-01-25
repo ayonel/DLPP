@@ -44,50 +44,50 @@ SEG_PROPORTION = 8/10
 FOLDS = 5
 # 按重要性排序之后的
 # 确定之后的
-ayonel_numerical_attr = [
-    'history_commit_passrate',
-    # 'commits_files_touched',
-    # 'last_10_pr_rejected',
-    # 'commits',
-    # 'files_changes',
-    #
-    # 'last_10_pr_merged',
-    # 'src_churn',
-    # 'pr_file_rejected_proportion',
-    # 'src_addition',
-    # 'history_pr_num_decay',
-    # 'team_size',
-    # 'src_deletion',
+attrs = [
+    # gousios
+    ('commits_files_touched', 0),
+    ('perc_ext_contribs', 0),
+    ('team_size', 0),
+    ('sloc', 0),
+    ('test_lines_per_kloc', 0),
+    ('commits', 0),
+    ('files_changes', 0),
+    ('src_churn', 0),
+    ('test_churn', 0),
+    ('history_commit_num', 0),
+    ('history_commit_passrate', 0),
+
+    # ayonel
+    ('file_similarity_merged', 0),
+    ('file_similarity_rejected', 0),
+    ('text_similarity_merged', 0),
+    ('text_similarity_rejected', 0),
+    ('last_10_pr_merged', 0),
+    ('last_10_pr_rejected', 0),
+    ('pr_file_merged_count', 0),
+    ('pr_file_merged_proportion', 0),
+    ('pr_file_rejected_count', 0),
+    ('pr_file_rejected_proportion', 0),
+    ('pr_file_submitted_count', 0),
+    ('recent_3_month_commit', 0),
+    ('recent_3_month_project_pr_num', 0),
+    ('recent_project_passrate', 0),
+    ('src_addition', 0),
+    ('src_deletion', 0),
+    ('text_code_proportion', 0),
+    ('history_commit_review_time', 0),
+    ('history_pass_pr_num', 0),
+
+    # bool
+    ('is_reviewer_commit', 1),
+    ('has_test', 1),
+    ('text_forward_link', 1),
+    ('last_pr', 1),
+    ('has_body', 1)
 
 ]
 
-to_add = [
-    'history_pass_pr_num',
-    'history_commit_num',
-    'pr_file_rejected_count',
-    'text_code_proportion',
-    'history_commit_review_time',
-    'recent_1_month_project_pr_num',
-    'pr_file_merged_count',
-    'pr_file_submitted_count',
-    'recent_3_month_project_pr_num',
-    'recent_3_month_pr',
-    'pr_file_merged_proportion',
-    'recent_3_month_commit',
-    'recent_project_passrate',
-    'pr_file_merged_count_decay',
-    'pr_file_submitted_count_decay',
-
-]
-
-
-ayonel_boolean_attr = [
-    'is_reviewer_commit',
-    # 'has_test',
-    'text_forward_link',
-    'last_pr',
-    # 'has_body',
-]
 
 ayonel_categorical_attr_handler = [
     # ('week', week_handler)
@@ -135,12 +135,13 @@ def run(client, clf, print_prf=False, print_main_proportion=False):
 
 # 按月训练
 @mongo
-def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1, persistence=False, ayonel_numerical_attr=[]):
+def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1, persistence=False, ayonel_numerical_attr=None, ayonel_boolean_attr=None):
 
     this_ayonel_numerical_attr = ayonel_numerical_attr
     data_dict, pullinfo_list_dict = load_data_monthly(ayonel_numerical_attr=this_ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
                                   ayonel_categorical_attr_handler=ayonel_categorical_attr_handler, MonthGAP=MonthGAP)
     accuracy = 0
+    AUC = 0
     for org, repo in org_list:
         # print(org+",", end='')
         pullinfo_list = pullinfo_list_dict[org]
@@ -231,29 +232,72 @@ def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_p
         #     main_proportion = predict_result.count(1) / len(predict_result)
         #     print(',%f' % (main_proportion if main_proportion > 0.5 else 1 - main_proportion), end='')
         #
-        AUC = 0.0
         if print_AUC:
             y = np.array(actual_result)
             pred = np.array(predict_result_prob)
             fpr, tpr, thresholds = roc_curve(y, pred)
-            AUC = auc(fpr, tpr)
-            print(',%f' % (AUC if AUC > 0.5 else 1 - AUC), end='')
+            AUC += auc(fpr, tpr)
+            # print(',%f' % (AUC if AUC > 0.5 else 1 - AUC), end='')
         # print()
-    return accuracy/len(org_list), AUC
+    return accuracy/len(org_list), AUC/len(org_list)
 
 
 if __name__ == '__main__':
-    base = 0.8230396499494876
-
-
 
     clf = XGBClassifier(seed=RANDOM_SEED)
     # clf = RandomForestClassifier(random_state=RANDOM_SEED, class_weight='balanced_subsample')
     # clf = CostSensitiveBaggingClassifier()
 
-    for k,param in enumerate(to_add):
-        accuracy, AUC = run_monthly(clf, print_prf=False, print_prf_each=True, print_main_proportion=False, print_AUC=True, MonthGAP=6, persistence=False, ayonel_numerical_attr=ayonel_numerical_attr+[param])
-        if accuracy > base:
-            print(param+','+str(accuracy)+','+str(AUC))
+    clf.fit(np.array([[1]]),np.array([1]))
 
-    # run(XGBClassifier(seed=RANDOM_SEED))
+    outfile = open('feature_selection/feature_selection.csv', "w", encoding="utf-8", newline="")
+    writer = csv.writer(outfile)
+    base = 0
+    AUC = 0
+    accuracy = 0
+    best_ayonel_numerical_attr = []
+    best_ayonel_boolean_attr = []
+    print(str(base) + '---->' + str(AUC) + ', 数组还剩：' + str(len(attrs)))
+    round = 1
+    while True:
+        best_attr = ''
+        best_type = 0
+        print("第"+str(round)+"轮开始：")
+        for attr, type in attrs:
+            ayonel_numerical_attr = best_ayonel_numerical_attr.copy()
+            ayonel_boolean_attr = best_ayonel_boolean_attr.copy()
+            if type == 0:  # 数值属性
+                ayonel_numerical_attr.append(attr)
+            else:  # bool属性
+                ayonel_boolean_attr.append(attr)
+            print('ayonel_numerical_attr:' + str(ayonel_numerical_attr))
+            print('ayonel_boolean_attr:' + str(ayonel_boolean_attr))
+            print('*****************************')
+            this_accuracy, this_AUC = run_monthly(clf, print_prf=False, print_prf_each=False, print_main_proportion=False,
+                                                  print_AUC=True, MonthGAP=6, persistence=False,
+                                                  ayonel_numerical_attr=ayonel_numerical_attr,
+                                                  ayonel_boolean_attr=ayonel_boolean_attr)
+
+            if this_AUC > AUC:
+                AUC = this_AUC
+                accuracy = this_accuracy
+                best_attr = attr
+                best_type = type
+
+        if AUC <= base:  # AUC 没有提高
+            break
+
+        attrs.remove((best_attr, best_type))
+        print(str(base) + '---->' + str(AUC)+', 数组还剩：'+str(len(attrs))+",本轮选择属性为："+best_attr)
+        base = AUC
+        if best_type == 0:  # 数值属性
+            best_ayonel_numerical_attr.append(best_attr)
+        else:
+            best_ayonel_boolean_attr.append(best_attr)
+
+        writer.writerow([best_attr, accuracy, AUC])
+        round += 1
+    print('ayonel_numerical_attr:' + str(best_ayonel_numerical_attr))
+    print('ayonel_boolean_attr:' + str(best_ayonel_boolean_attr))
+
+

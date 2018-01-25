@@ -94,5 +94,21 @@ def language():
                 break
     counter = Counter(lan_list)
     print(counter)
+
+@mongo
+def count(client):
+    outfile = open("data/count.csv", "w", newline="")
+    writer = csv.writer(outfile)
+    writer.writerow(["repo", "pr数", "pr评论数", "pr文件数", "pr commit数", "commit","commitfile,reviewer"])
+    for org, repo in org_list:
+        pr_num = client[org]['pullinfo'].find().count()
+        pr_comment_num = client[org]['pullcomment'].find().count()
+        pr_file_num = client[org]['pullfile'].find().count()
+        pr_commit_num = client[org]['pullcommit'].find().count()
+        commit_num = client[org]['commit'].find().count()
+        commit_file_num = client[org]['commitfile'].find().count()
+        reviewer_num = client[org]['reviewer'].find().count()
+        writer.writerow([repo, pr_num,pr_comment_num,pr_file_num,pr_commit_num,commit_num,commit_file_num,reviewer_num])
+
 if __name__ == '__main__':
-    language()
+    count()

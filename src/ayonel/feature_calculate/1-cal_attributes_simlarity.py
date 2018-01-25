@@ -282,9 +282,8 @@ if __name__ == '__main__':
         result_dict = cal_similarity(pull_list, pull_dict, result_dict)
         result_dict = history_file_regular_1weight(pull_list, pull_dict, result_dict, file_sim_score_dict)
 
-        print(result_dict)
-        # for pr in result_dict:
-        #     client[org]['ayonel'].update({'number': pr}, {'$set': result_dict[pr]})
+        for pr in result_dict:
+            client[org]['ayonel'].update({'number': pr}, {'$set': result_dict[pr]})
 
 
 

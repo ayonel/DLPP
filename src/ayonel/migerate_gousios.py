@@ -14,12 +14,15 @@ from src.constants import *
 def migerate(client):
     for org, repo in org_list:
         print(org)
-        gousios_attr = list(client[org]['gousios'].find({}, {'_id': 0, 'commits_files_touched': 1, 'perc_ext_contribs': 1, 'number': 1, 'team_size': 1}))
+        gousios_attr = list(client[org]['gousios'].find({}, {'_id': 0}))
         for attr in gousios_attr:
             data = {
-                'commits_files_touched': attr['commits_files_touched'],
-                'perc_ext_contribs': attr['perc_ext_contribs'],
-                'team_size': attr['team_size']
+                # 'commits_files_touched': attr['commits_files_touched'],
+                # 'perc_ext_contribs': attr['perc_ext_contribs'],
+                # 'team_size': attr['team_size'],
+                'test_churn': attr['test_churn'],
+                'sloc': attr['sloc'],
+                'test_lines_per_kloc': attr['test_lines_per_kloc'],
             }
             client[org]['ayonel'].update({'number': attr['number']}, {'$set': data}, upsert=True)
 
@@ -52,9 +55,6 @@ if __name__ == '__main__':
     # for org, repo in org_list:
     #     print("mongoimport -d " + org +" -c model --upsert " + org)
 
+    migerate()
 
-    client = get_connection()
-    attr = client['Baystation12']['ayonel'].find_one()
-    for k in attr:
-        print(k)
 
