@@ -363,11 +363,6 @@ def run_monthly(client, clf, thred=0.5, deserialize=False, over_sample=False, pr
 
 if __name__ == '__main__':
 
-    # model = 'costsensitiverandodeserializemforest'
-    models = {
-        'xgboost': 1,
-    }
-    # model = 'randomforest'
     # clf = RandomForestClassifier(random_state=RANDOM_SEED, class_weight='balanced_subsample')
     # clf = CostSensitiveBaggingClassifier()
     clf = XGBClassifier(seed=RANDOM_SEED)

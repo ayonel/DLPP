@@ -45,17 +45,16 @@ FOLDS = 5
 # 按单特征分类器重要性排序之后的
 
 attrs = [
-    # ('history_commit_passrate', 0),
-    # ('history_pass_pr_num', 0),
-    # ('history_commit_review_time', 0),
-    # ('is_reviewer_commit', 1),
-    # ('history_commit_num', 0),
-    # ('last_10_pr_rejected', 0),
-    # ('commits_files_touched', 0),
-    # ('last_10_pr_merged', 0),
-    # ('last_pr', 1),
-    # ('commits', 0),
-
+    ('history_commit_passrate', 0),
+    ('history_pass_pr_num', 0),
+    ('history_commit_review_time', 0),
+    ('is_reviewer_commit', 1),
+    ('history_commit_num', 0),
+    ('last_10_pr_rejected', 0),
+    ('commits_files_touched', 0),
+    ('last_10_pr_merged', 0),
+    ('last_pr', 1),
+    ('commits', 0),
     ('files_changes', 0),
     ('src_churn', 0),
     ('src_addition', 0),
@@ -136,6 +135,9 @@ def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_p
                                   ayonel_categorical_attr_handler=ayonel_categorical_attr_handler, MonthGAP=MonthGAP)
     accuracy = 0
     AUC = 0
+    mean_merged_precision, mean_merged_recall, mean_merged_F1, \
+    mean_rejected_precision, mean_rejected_recall, mean_rejected_F1 = 0, 0, 0, 0, 0, 0
+
     for org, repo in org_list:
         # print(org+",", end='')
         pullinfo_list = pullinfo_list_dict[org]
@@ -161,6 +163,7 @@ def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_p
             predict_result += clf.predict(test_X).tolist()  # 预测结果
             predict_result_prob += [x[0] for x in clf.predict_proba(test_X).tolist()]
             mean_accuracy += clf.score(test_X, test_y)
+            train_X = np.concatenate((train_X, test_X))
             train_y = np.concatenate((train_y, test_y))
 
         acc_num = 0
@@ -185,23 +188,43 @@ def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_p
 
                 client[persistence_db][persistence_col].insert(data)
 
-        accuracy+= acc_num / len(actual_result)
+        accuracy += acc_num / len(actual_result)
 
         # precision, recall, F1 = precision_recall_f1(predict_result, actual_result)
         #
         # if print_prf:
         #     print(',%f,%f,%f' % (precision, recall, F1), end='')
         #
-        # if print_prf_each:
-        #     merged_precision, merged_recall, merged_F1 = precision_recall_f1(predict_result, actual_result, POSITIVE=0)
-        #     rejected_precision, rejected_recall, rejected_F1 = precision_recall_f1(predict_result, actual_result, POSITIVE=1)
-        #     print(',%f,%f,%f,%f,%f,%f' % (merged_F1, merged_precision, merged_recall, rejected_F1,rejected_precision, rejected_recall ), end='')
-        #
-        #
-        # if print_main_proportion:
-        #     main_proportion = predict_result.count(1) / len(predict_result)
-        #     print(',%f' % (main_proportion if main_proportion > 0.5 else 1 - main_proportion), end='')
-        #
+        if print_prf_each:
+            try:
+                merged_precision, merged_recall, merged_F1 = precision_recall_f1(predict_result, actual_result, POSITIVE=0)
+                if mean_merged_precision == -1 or mean_merged_recall == -1 or mean_merged_F1 == -1:
+                    pass
+                else:
+                    mean_merged_precision += merged_precision
+                    mean_merged_recall += merged_recall
+                    mean_merged_F1 += merged_F1
+            except ValueError:
+                mean_merged_precision, mean_merged_recall, mean_merged_F1 = -1, -1, -1
+
+
+            try:
+                rejected_precision, rejected_recall, rejected_F1 = precision_recall_f1(predict_result, actual_result, POSITIVE=1)
+                if mean_rejected_precision == -1 or mean_rejected_recall == -1 or mean_rejected_F1 == -1:
+                    pass
+                else:
+                    mean_rejected_precision += rejected_precision
+                    mean_rejected_recall += rejected_recall
+                    mean_rejected_F1 += rejected_F1
+            except ValueError:
+                mean_rejected_precision, mean_rejected_recall, mean_rejected_F1 = -1, -1, -1
+
+            # print(',%f,%f,%f,%f,%f,%f' % (merged_F1, merged_precision, merged_recall, rejected_F1,rejected_precision, rejected_recall ), end='')
+
+        if print_main_proportion:
+            main_proportion = predict_result.count(1) / len(predict_result)
+            print(',%f' % (main_proportion if main_proportion > 0.5 else 1 - main_proportion), end='')
+
         if print_AUC:
             y = np.array(actual_result)
             pred = np.array(predict_result_prob)
@@ -210,92 +233,30 @@ def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_p
             AUC += this_AUC if this_AUC > 0.5 else 1 - this_AUC
             # print(',%f' % (AUC if AUC > 0.5 else 1 - AUC), end='')
         # print()
-    return accuracy/len(org_list), AUC/len(org_list)
+    if mean_merged_precision == -1 or mean_merged_recall == -1 or mean_merged_F1 == -1 \
+        or mean_rejected_precision == -1 or mean_rejected_recall == -1 or mean_rejected_F1 == -1:
+        return accuracy/len(org_list), AUC/len(org_list), -1, -1, -1, -1, -1, -1
+    else:
+        return accuracy / len(org_list), AUC / len(org_list), \
+               mean_merged_precision/len(org_list), \
+               mean_merged_recall/len(org_list), \
+               mean_merged_F1/len(org_list), \
+               mean_rejected_precision/len(org_list), \
+               mean_rejected_recall/len(org_list), \
+               mean_rejected_recall/len(org_list)
 
 
-#
-# # 从最好的10个属性开始搜索，加入最好的属性。
-# if __name__ == '__main__':
-#
-#     clf = XGBClassifier(seed=RANDOM_SEED)
-#     # clf = RandomForestClassifier(random_state=RANDOM_SEED, class_weight='balanced_subsample')
-#     # clf = CostSensitiveBaggingClassifier()
-#
-#     outfile = open('feature_selection/feature_selection_base10.csv', "w", encoding="utf-8", newline="")
-#     writer = csv.writer(outfile)
-#     base = 0
-#     AUC = 0
-#     accuracy = 0
-#     best_ayonel_numerical_attr = [
-#         'history_commit_passrate',
-#         'history_pass_pr_num',
-#         'history_commit_review_time',
-#         'history_commit_num',
-#         'last_10_pr_rejected',
-#         'commits_files_touched',
-#         'last_10_pr_merged',
-#         'commits',
-#     ]
-#     best_ayonel_boolean_attr = [
-#         'is_reviewer_commit',
-#         'last_pr',
-#     ]
-#     print(str(base) + '---->' + str(AUC) + ', 数组还剩：' + str(len(attrs)))
-#     round = 1
-#     while True:
-#         best_attr = ''
-#         best_type = 0
-#         print("第"+str(round)+"轮开始：")
-#         for attr, type in attrs:
-#             ayonel_numerical_attr = best_ayonel_numerical_attr.copy()
-#             ayonel_boolean_attr = best_ayonel_boolean_attr.copy()
-#             if type == 0:  # 数值属性
-#                 ayonel_numerical_attr.append(attr)
-#             else:  # bool属性
-#                 ayonel_boolean_attr.append(attr)
-#             print('ayonel_numerical_attr:' + str(ayonel_numerical_attr))
-#             print('ayonel_boolean_attr:' + str(ayonel_boolean_attr))
-#             print('*****************************')
-#             this_accuracy, this_AUC = run_monthly(clf, print_prf=False, print_prf_each=False, print_main_proportion=False,
-#                                                   print_AUC=True, MonthGAP=6, persistence=False,
-#                                                   ayonel_numerical_attr=ayonel_numerical_attr,
-#                                                   ayonel_boolean_attr=ayonel_boolean_attr)
-#
-#             if this_AUC > AUC:
-#                 AUC = this_AUC
-#                 accuracy = this_accuracy
-#                 best_attr = attr
-#                 best_type = type
-#
-#         if AUC <= base:  # AUC 没有提高
-#             break
-#
-#         attrs.remove((best_attr, best_type))
-#         print(str(base) + '---->' + str(AUC)+', 数组还剩：'+str(len(attrs))+",本轮选择属性为："+best_attr)
-#         base = AUC
-#         if best_type == 0:  # 数值属性
-#             best_ayonel_numerical_attr.append(best_attr)
-#         else:
-#             best_ayonel_boolean_attr.append(best_attr)
-#
-#         writer.writerow([best_attr, accuracy, AUC])
-#         print("本轮最优结果，acc:"+str(accuracy)+',AUC:'+str(AUC))
-#         round += 1
-#     print('ayonel_numerical_attr:' + str(best_ayonel_numerical_attr))
-#     print('ayonel_boolean_attr:' + str(best_ayonel_boolean_attr))
-#
-#
-# 从0个属性开始搜索，加入最好的属性。
+
 if __name__ == '__main__':
 
     clf = XGBClassifier(seed=RANDOM_SEED)
-    # clf = RandomForestClassifier(random_state=RANDOM_SEED, class_weight='balanced_subsample')
-    # clf = CostSensitiveBaggingClassifier()
 
     outfile = open('feature_selection/feature_selection.csv', "w", encoding="utf-8", newline="")
     writer = csv.writer(outfile)
     base = 0
     AUC = 0
+    mean_merged_precision, mean_merged_recall, mean_merged_F1,\
+    mean_rejected_precision, mean_rejected_recall, mean_rejected_F1,=0,0,0,0,0,0
     accuracy = 0
     best_ayonel_numerical_attr = []
     best_ayonel_boolean_attr = []
@@ -315,12 +276,20 @@ if __name__ == '__main__':
             print('ayonel_numerical_attr:' + str(ayonel_numerical_attr))
             print('ayonel_boolean_attr:' + str(ayonel_boolean_attr))
             print('*****************************')
-            this_accuracy, this_AUC = run_monthly(clf, print_prf=False, print_prf_each=False, print_main_proportion=False,
-                                                  print_AUC=True, MonthGAP=6, persistence=False,
-                                                  ayonel_numerical_attr=ayonel_numerical_attr,
-                                                  ayonel_boolean_attr=ayonel_boolean_attr)
+            this_accuracy, this_AUC,\
+            this_mean_merged_precision, this_mean_merged_recall, this_mean_merged_F1, \
+            this_mean_rejected_precision, this_mean_rejected_recall, this_mean_rejected_F1 = \
+                run_monthly(clf, print_prf=False, print_prf_each=True,
+                                print_main_proportion=False,
+                                print_AUC=True, MonthGAP=6, persistence=False,
+                                ayonel_numerical_attr=ayonel_numerical_attr,
+                                ayonel_boolean_attr=ayonel_boolean_attr)
 
             if this_AUC > AUC:
+                mean_merged_precision, mean_merged_recall, mean_merged_F1, \
+                mean_rejected_precision, mean_rejected_recall, mean_rejected_F1 = \
+                    this_mean_merged_precision, this_mean_merged_recall, this_mean_merged_F1, \
+                    this_mean_rejected_precision, this_mean_rejected_recall, this_mean_rejected_F1
                 AUC = this_AUC
                 accuracy = this_accuracy
                 best_attr = attr
@@ -337,37 +306,40 @@ if __name__ == '__main__':
         else:
             best_ayonel_boolean_attr.append(best_attr)
 
-        writer.writerow([best_attr, accuracy, AUC])
+        writer.writerow([best_attr,
+                         mean_merged_precision, mean_merged_recall, mean_merged_F1,
+                         mean_rejected_precision, mean_rejected_recall, mean_rejected_F1,
+                         accuracy, AUC])
+        outfile.flush()
         print("本轮最优结果，acc:" + str(accuracy) + ',AUC:' + str(AUC))
-        writer.flush()
         round += 1
+
     print('ayonel_numerical_attr:' + str(best_ayonel_numerical_attr))
     print('ayonel_boolean_attr:' + str(best_ayonel_boolean_attr))
+    outfile.close()
 
+# 单特征分类器结果计算。
+# if __name__ == '__main__':
+#     clf = XGBClassifier(seed=RANDOM_SEED)
+#     # clf = RandomForestClassifier(random_state=RANDOM_SEED, class_weight='balanced_subsample')
+#     # clf = CostSensitiveBaggingClassifier()
 #
 #
-# # 单特征分类器结果计算。
-# # if __name__ == '__main__':
-# #     clf = XGBClassifier(seed=RANDOM_SEED)
-# #     # clf = RandomForestClassifier(random_state=RANDOM_SEED, class_weight='balanced_subsample')
-# #     # clf = CostSensitiveBaggingClassifier()
-# #
-# #
-# #     AUC = 0
-# #     accuracy = 0
-# #     best_attr = ''
-# #     best_type = 0
-# #     for attr, type in attrs:
-# #         ayonel_numerical_attr=[]
-# #         ayonel_boolean_attr=[]
-# #         if type == 0:
-# #             ayonel_numerical_attr.append(attr)
-# #         else:
-# #             ayonel_boolean_attr.append(attr)
-# #
-# #         accuracy, AUC = run_monthly(clf, print_prf=False, print_prf_each=False, print_main_proportion=False,
-# #                                               print_AUC=True, MonthGAP=6, persistence=False,
-# #                                               ayonel_numerical_attr=ayonel_numerical_attr,
-# #                                               ayonel_boolean_attr=ayonel_boolean_attr)
-# #
-# #         print(attr+','+str(accuracy)+','+str(AUC))
+#     AUC = 0
+#     accuracy = 0
+#     best_attr = ''
+#     best_type = 0
+#     for attr, type in attrs:
+#         ayonel_numerical_attr=[]
+#         ayonel_boolean_attr=[]
+#         if type == 0:
+#             ayonel_numerical_attr.append(attr)
+#         else:
+#             ayonel_boolean_attr.append(attr)
+#
+#         accuracy, AUC = run_monthly(clf, print_prf=False, print_prf_each=False, print_main_proportion=False,
+#                                               print_AUC=True, MonthGAP=6, persistence=False,
+#                                               ayonel_numerical_attr=ayonel_numerical_attr,
+#                                               ayonel_boolean_attr=ayonel_boolean_attr)
+#
+#         print(attr+','+str(accuracy)+','+str(AUC))

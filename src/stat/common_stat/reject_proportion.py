@@ -8,11 +8,10 @@ if __name__ == '__main__':
     for org, repo in org_list:
         merged = client[org]['pullinfo'].find({'merged': True}).count()
         whole = client[org]['pullinfo'].find({}).count()
-        print(org+':'+str(whole))
-        L.append(org+','+str(1-merged/whole))
+        L.append(repo+','+str(1-merged/whole))
     L.sort(key=lambda x: float(x.split(',')[1]), reverse=True)
-    # for org in L:
-    #     print(org)
+    for item in L:
+        print(item)
     dbutil.close_connection(client)
 
 
