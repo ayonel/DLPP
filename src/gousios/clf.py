@@ -131,8 +131,12 @@ def run_monthly(clf, print_prf=False, print_prf_each=False, print_main_proportio
             print(',%f' % (AUC if AUC > 0.5 else 1-AUC), end='')
         print()
 if __name__ == '__main__':
-    clf = RandomForestClassifier(random_state=RANDOM_SEED)
-    run_monthly(clf, print_prf=False, print_prf_each=True, print_main_proportion=False, print_AUC=True, MonthGAP=6)
-    # run(clf)
+    # clf = RandomForestClassifier(random_state=RANDOM_SEED)
+    clf = XGBClassifier(seed=RANDOM_SEED)
+    run_monthly(clf, print_prf=False,
+                print_prf_each=False,
+                print_main_proportion=False,
+                print_AUC=True,
+                MonthGAP=6)
 
 

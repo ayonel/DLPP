@@ -106,46 +106,53 @@ FOLDS = 5
 # ]
 
 ayonel_numerical_attr = [
-    'commits_files_touched',
-    'perc_ext_contribs',
-    'team_size',
-    'sloc',
-    'test_lines_per_kloc',
-    'commits',
-    'files_changes',
-    'src_churn',
-    'test_churn',
-    'history_commit_num',
     'history_commit_passrate',
-    'file_similarity_merged',
-    'file_similarity_rejected',
-    'text_similarity_merged',
-    'text_similarity_rejected',
-    'last_10_pr_merged',
+    'commits_files_touched',
     'last_10_pr_rejected',
-    'pr_file_merged_count',
-    'pr_file_merged_proportion',
-    'pr_file_rejected_count',
+    'src_churn',
     'pr_file_rejected_proportion',
-    'pr_file_submitted_count',
-    'recent_3_month_commit',
-    'recent_3_month_project_pr_num',
-    'recent_project_passrate',
-    'src_addition',
+    # 'is_reviewer_commit',
+    'commits',
+    'text_similarity_merged',
+    # 'last_pr',
+    'text_similarity_rejected',
+    # 'has_test',
     'src_deletion',
-    'text_code_proportion',
-    'history_commit_review_time',
-    'history_pass_pr_num'
+    # 'has_body',
+    'files_changes',
+    'src_addition',
+    'last_10_pr_merged',
+    # 'text_forward_link',
+
+    ## 以下属性无用
+    # 'history_pass_pr_num',
+    # 'history_commit_review_time',
+    # 'history_commit_num',
+    # 'pr_file_merged_proportion',
+    # 'pr_file_rejected_count',
+    # 'pr_file_merged_count',
+    # 'pr_file_submitted_count',
+    # 'test_churn',
+    # 'sloc',
+    # 'recent_3_month_project_pr_num',
+    # 'text_code_proportion',
+    # 'team_size',
+    # 'file_similarity_rejected',
+    # 'file_similarity_merged',
+    # 'recent_project_passrate',
+    # 'test_lines_per_kloc',
+    # 'recent_3_month_commit',
+    # 'perc_ext_contribs',
 ]
 
-
-
+# 5个bool属性都用了
 ayonel_boolean_attr = [
     'is_reviewer_commit',
-    'has_test',
-    'text_forward_link',
     'last_pr',
+    'has_test',
     'has_body',
+    'text_forward_link',
+
 ]
 
 ayonel_categorical_attr_handler = [
@@ -195,7 +202,7 @@ def run(client, clf, print_prf=False, print_main_proportion=False):
 
 # 按月训练
 @mongo
-def run_monthly(client, models, thred=0.5, deserialize=False, over_sample=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1, persistence=False):
+def run_monthly(client, clf, thred=0.5, deserialize=False, over_sample=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1, persistence=False):
     data_dict, pullinfo_list_dict = load_data_monthly(ayonel_numerical_attr=ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
                                   ayonel_categorical_attr_handler=ayonel_categorical_attr_handler, MonthGAP=MonthGAP)
 
@@ -273,59 +280,43 @@ def run_monthly(client, models, thred=0.5, deserialize=False, over_sample=False,
                 continue
             test_X = np.array(batch[0])
             test_y = np.array(batch[1])
-            clf_list = _init_classifier(models, deserialize, org, round, MonthGAP)
+            # clf_list = _init_classifier(models, deserialize, org, round, MonthGAP)
             # print(clf.get_params())
-
-            batch_predict_result_proba = np.zeros(len(test_y))
-
             ########################################SMOTE过采样#####################################
-            for clf, weight in clf_list:
-                if over_sample:
-                    if clf.__class__.__name__ == 'CostSensitiveRandomForestClassifier':
-                        if train_y.tolist().count(0) <= 6 or train_y.tolist().count(1) <= 6:
-                            # cost_mat = np.zeros((len(train_y), 4))
-                            # cost_mat[:, 0] = 0.0,                   # false_positive_cost
-                            # cost_mat[:, 1] = 0.0                    # false_positive_cost
-                            # cost_mat[:, 2] = 0.0                    # true_positive_cost
-                            # cost_mat[:, 3] = 0.0,                   # true_negative_cost
-                            clf.fit(train_X, train_y, _cal_cost_mat(train_y))
-                        else:
-                            resample_train_X, resample_train_y = SMOTE(ratio='auto', random_state=RANDOM_SEED).fit_sample(
-                                train_X, train_y)
-                            clf.fit(resample_train_X, resample_train_y, _cal_cost_mat(resample_train_y))
-                    else:
-                        if train_y.tolist().count(0) <= 6 or train_y.tolist().count(1) <= 6:
-                            train(clf, train_X, train_y)
-                        else:
-                            resample_train_X, resample_train_y = SMOTE(ratio='auto', random_state=RANDOM_SEED).fit_sample(
-                                train_X, train_y)
-                            train(clf, resample_train_X, resample_train_y)
-
-                else:   # 正常
-                    train(clf, train_X, train_y)
-                batch_predict_result_proba += clf.predict_proba(test_X)[:, 0]
-
+            # for clf, weight in clf_list:
+            #     if over_sample:
+            #         if clf.__class__.__name__ == 'CostSensitiveRandomForestClassifier':
+            #             if train_y.tolist().count(0) <= 6 or train_y.tolist().count(1) <= 6:
+            #                 # cost_mat = np.zeros((len(train_y), 4))
+            #                 # cost_mat[:, 0] = 0.0,                   # false_positive_cost
+            #                 # cost_mat[:, 1] = 0.0                    # false_positive_cost
+            #                 # cost_mat[:, 2] = 0.0                    # true_positive_cost
+            #                 # cost_mat[:, 3] = 0.0,                   # true_negative_cost
+            #                 clf.fit(train_X, train_y, _cal_cost_mat(train_y))
+            #             else:
+            #                 resample_train_X, resample_train_y = SMOTE(ratio='auto', random_state=RANDOM_SEED).fit_sample(
+            #                     train_X, train_y)
+            #                 clf.fit(resample_train_X, resample_train_y, _cal_cost_mat(resample_train_y))
+            #         else:
+            #             if train_y.tolist().count(0) <= 6 or train_y.tolist().count(1) <= 6:
+            #                 train(clf, train_X, train_y)
+            #             else:
+            #                 resample_train_X, resample_train_y = SMOTE(ratio='auto', random_state=RANDOM_SEED).fit_sample(
+            #                     train_X, train_y)
+            #                 train(clf, resample_train_X, resample_train_y)
+            #
+            #     else:   # 正常
+            #         train(clf, train_X, train_y)
+            #     batch_predict_result_proba += clf.predict_proba(test_X)[:, 0]
+            train(clf, train_X, train_y)
             actual_result += test_y.tolist()  # 真实结果
-
-            predict_result_prob += batch_predict_result_proba.tolist()
-
-            predict_result += [0 if proba >= 0.5 else 1 for proba in batch_predict_result_proba.tolist()]  # 预测结果
+            predict_result += clf.predict(test_X).tolist()  # 预测结果
+            predict_result_prob += [x[0] for x in clf.predict_proba(test_X).tolist()]
+            mean_accuracy += clf.score(test_X, test_y)
             train_X = np.concatenate((train_X, test_X))
             train_y = np.concatenate((train_y, test_y))
             round += 1
-            # print(predict_result)
-            # print(predict_result_prob)
 
-        # 开始输出结果
-        for k, pre in enumerate(predict_result_prob):
-            if pre < thred:
-                predict_result[k] = 1
-            else:
-                predict_result[k] = 0
-
-        # print(predict_result)
-
-        # print(str(thred)+",", end='')
         acc_num = 0
         for i in range(len(actual_result)):
             if actual_result[i] == predict_result[i]:
@@ -369,21 +360,21 @@ def run_monthly(client, models, thred=0.5, deserialize=False, over_sample=False,
         print()
 
 
+
 if __name__ == '__main__':
 
     # model = 'costsensitiverandodeserializemforest'
     models = {
-        'xgboost': 0.7,
-        'svm': 0.3,
-
+        'xgboost': 1,
     }
     # model = 'randomforest'
     # clf = RandomForestClassifier(random_state=RANDOM_SEED, class_weight='balanced_subsample')
     # clf = CostSensitiveBaggingClassifier()
-    run_monthly(models,
+    clf = XGBClassifier(seed=RANDOM_SEED)
+    run_monthly(clf,
                 thred=0.5,
                 deserialize=False,
-                over_sample=False,
+                over_sample=True,
                 print_prf_each=False,
                 print_main_proportion=False,
                 print_AUC=True,
