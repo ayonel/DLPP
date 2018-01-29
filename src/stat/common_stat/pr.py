@@ -11,6 +11,7 @@ from src.constants import *
 import csv
 
 
+
 @mongo
 def pr(client):
     outfile = open("data/pr_num.csv", "w", newline="")
@@ -65,6 +66,7 @@ def comment(client):
     print(sum(comment_num_list))
     print(sorted(comment_num_list))
 
+
 import requests
 import json
 def star():
@@ -75,6 +77,7 @@ def star():
         star_num_list.append(star_num)
     print(sum(star_num_list))
     print(sorted(star_num_list))
+
 
 from collections import Counter
 def language():
@@ -95,6 +98,7 @@ def language():
     counter = Counter(lan_list)
     print(counter)
 
+
 @mongo
 def count(client):
     outfile = open("data/count.csv", "w", newline="")
@@ -110,5 +114,11 @@ def count(client):
         reviewer_num = client[org]['reviewer'].find().count()
         writer.writerow([repo, pr_num,pr_comment_num,pr_file_num,pr_commit_num,commit_num,commit_file_num,reviewer_num])
 
+
+@mongo
+def stat(client):
+    for org, repo in org_list:
+        pass
+
 if __name__ == '__main__':
-    count()
+    stat()

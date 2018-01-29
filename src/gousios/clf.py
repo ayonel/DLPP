@@ -7,6 +7,7 @@
 '''
 import csv
 import numpy as np
+import time
 from collections import Counter
 from src.gousios.LoadData import *
 from src.constants import *
@@ -76,10 +77,11 @@ def run(clf, print_prf=False, print_main_proportion=False):
     print(str(ACC/len(org_list)))
 
 
-def run_monthly(clf, print_prf=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1):
+def run_monthly(clf, print_time=False, print_prf=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1):
     data_dict = load_data_monthly(gousios_attr_list=gousios_attr_list, MonthGAP=MonthGAP)
     for org,repo in org_list:
-        print(org+",", end='')
+        start_time = time.time()
+        print(repo+",", end='')
         batch_iter = data_dict[org]
         train_batch = batch_iter.__next__()
         train_X = np.array(train_batch[0])
@@ -110,6 +112,12 @@ def run_monthly(clf, print_prf=False, print_prf_each=False, print_main_proportio
             if actual_result[i] == predict_result[i]:
                 acc_num += 1
         print(acc_num/len(actual_result), end='')
+        if print_AUC:
+            y = np.array(actual_result)
+            pred = np.array(predict_result_prob)
+            fpr, tpr, thresholds = roc_curve(y, pred, pos_label=1)
+            AUC = auc(fpr, tpr)
+            print(',%f' % (AUC if AUC > 0.5 else 1-AUC), end='')
         precision, recall, F1 = precision_recall_f1(predict_result, actual_result)
         if print_prf:
             print(",%f,%f,%f" % (precision, recall, F1), end='')
@@ -123,18 +131,18 @@ def run_monthly(clf, print_prf=False, print_prf_each=False, print_main_proportio
             main_proportion = predict_result.count(1) / len(predict_result)
             print(',%f' % (main_proportion if main_proportion > 0.5 else 1 - main_proportion), end='')
 
-        if print_AUC:
-            y = np.array(actual_result)
-            pred = np.array(predict_result_prob)
-            fpr, tpr, thresholds = roc_curve(y, pred, pos_label=1)
-            AUC = auc(fpr, tpr)
-            print(',%f' % (AUC if AUC > 0.5 else 1-AUC), end='')
+        if print_time:
+            print(',%f' % ((time.time()-start_time)/len(actual_result)), end='')
+            start_time = time.time()
         print()
+
 if __name__ == '__main__':
-    # clf = RandomForestClassifier(random_state=RANDOM_SEED)
-    clf = XGBClassifier(seed=RANDOM_SEED)
-    run_monthly(clf, print_prf=False,
-                print_prf_each=False,
+    clf = RandomForestClassifier(random_state=RANDOM_SEED)
+    # clf = XGBClassifier(seed=RANDOM_SEED)
+    run_monthly(clf,
+                print_time=True,
+                print_prf=False,
+                print_prf_each=True,
                 print_main_proportion=False,
                 print_AUC=True,
                 MonthGAP=6)

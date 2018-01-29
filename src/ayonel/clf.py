@@ -16,6 +16,7 @@
 '''
 import numpy as np
 import csv
+import time
 from src.ayonel.LoadData import *
 from src.constants import *
 from src.eval.eval_utils import precision_recall_f1
@@ -40,6 +41,7 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import roc_auc_score
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.naive_bayes import MultinomialNB
 from xgboost import XGBClassifier
 import xgboost as xgb
 from imblearn.over_sampling import SMOTE, ADASYN
@@ -122,7 +124,7 @@ ayonel_numerical_attr = [
     'files_changes',
     'src_addition',
     'last_10_pr_merged',
-    # 'text_forward_link',
+    'text_forward_link',
 
     ## 以下属性无用
     # 'history_pass_pr_num',
@@ -202,7 +204,7 @@ def run(client, clf, print_prf=False, print_main_proportion=False):
 
 # 按月训练
 @mongo
-def run_monthly(client, clf, thred=0.5, deserialize=False, over_sample=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1, persistence=False):
+def run_monthly(client, clf, print_time=True, over_sample=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1, persistence=False):
     data_dict, pullinfo_list_dict = load_data_monthly(ayonel_numerical_attr=ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
                                   ayonel_categorical_attr_handler=ayonel_categorical_attr_handler, MonthGAP=MonthGAP)
 
@@ -263,6 +265,7 @@ def run_monthly(client, clf, thred=0.5, deserialize=False, over_sample=False, pr
         return clf_list
 
     for org, repo in org_list:
+        start_time = time.time()
         print(org+",", end='')
         pullinfo_list = pullinfo_list_dict[org]
         batch_iter = data_dict[org]
@@ -275,6 +278,7 @@ def run_monthly(client, clf, thred=0.5, deserialize=False, over_sample=False, pr
         actual_result = []
         mean_accuracy = 0
         round = 1
+
         for batch in batch_iter:
             if len(batch[0]) == 0:  # 测试集没有数据，直接预测下一batch
                 continue
@@ -308,7 +312,21 @@ def run_monthly(client, clf, thred=0.5, deserialize=False, over_sample=False, pr
             #     else:   # 正常
             #         train(clf, train_X, train_y)
             #     batch_predict_result_proba += clf.predict_proba(test_X)[:, 0]
-            train(clf, train_X, train_y)
+            if over_sample:
+                if train_y.tolist().count(0) <= 6 or train_y.tolist().count(1) <= 6:
+                    train(clf, train_X, train_y)
+                else:
+                    resample_train_X, resample_train_y = SMOTE(ratio='auto', random_state=RANDOM_SEED).fit_sample(
+                                train_X, train_y)
+                    train(clf, resample_train_X, resample_train_y)
+            else:
+                if train_y.sum() != 0 and train_y.sum() != train_y.size:
+                    train(clf, train_X, train_y)
+                else:
+                    train_X = np.concatenate((train_X, test_X))
+                    train_y = np.concatenate((train_y, test_y))
+                    continue
+
             actual_result += test_y.tolist()  # 真实结果
             predict_result += clf.predict(test_X).tolist()  # 预测结果
             predict_result_prob += [x[0] for x in clf.predict_proba(test_X).tolist()]
@@ -338,8 +356,14 @@ def run_monthly(client, clf, thred=0.5, deserialize=False, over_sample=False, pr
                 }
 
                 client[persistence_db][persistence_col].insert(data)
-
         print(acc_num / len(actual_result), end='')
+
+        if print_AUC:
+            y = np.array(actual_result)
+            pred = np.array(predict_result_prob)
+            fpr, tpr, thresholds = roc_curve(y, pred)
+            AUC = auc(fpr, tpr)
+            print(',%f' % (AUC if AUC > 0.5 else 1 - AUC), end='')
 
         if print_prf_each:
             merged_precision, merged_recall, merged_F1 = precision_recall_f1(predict_result, actual_result, POSITIVE=0)
@@ -351,28 +375,27 @@ def run_monthly(client, clf, thred=0.5, deserialize=False, over_sample=False, pr
             main_proportion = predict_result.count(1) / len(predict_result)
             print(',%f' % (main_proportion if main_proportion > 0.5 else 1 - main_proportion), end='')
 
-        if print_AUC:
-            y = np.array(actual_result)
-            pred = np.array(predict_result_prob)
-            fpr, tpr, thresholds = roc_curve(y, pred)
-            AUC = auc(fpr, tpr)
-            print(',%f' % (AUC if AUC > 0.5 else 1 - AUC), end='')
+
+        if print_time:
+            print(',%f' % ((time.time()-start_time)/len(actual_result)), end='')
+            start_time = time.time()
         print()
 
 
 
 if __name__ == '__main__':
 
-    # clf = RandomForestClassifier(random_state=RANDOM_SEED, class_weight='balanced_subsample')
+    # clf = SVC(probability=True)
+    # clf = MultinomialNB()
+    # clf = RandomForestClassifier(random_state=RANDOM_SEED)
     # clf = CostSensitiveBaggingClassifier()
     clf = XGBClassifier(seed=RANDOM_SEED)
     run_monthly(clf,
-                thred=0.5,
-                deserialize=False,
-                over_sample=True,
+                print_time=True,
+                over_sample=False,
                 print_prf_each=False,
                 print_main_proportion=False,
-                print_AUC=True,
+                print_AUC=False,
                 MonthGAP=6,
                 persistence=False)
 
