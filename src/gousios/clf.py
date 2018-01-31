@@ -77,11 +77,13 @@ def run(clf, print_prf=False, print_main_proportion=False):
     print(str(ACC/len(org_list)))
 
 
-def run_monthly(clf, print_time=False, print_prf=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1):
+def run_monthly(clf, print_time=False, print_acc=False, print_prf=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1):
     data_dict = load_data_monthly(gousios_attr_list=gousios_attr_list, MonthGAP=MonthGAP)
-    for org,repo in org_list:
-        start_time = time.time()
-        print(repo+",", end='')
+    for org, repo in org_list:
+        train_cost_time = 0
+        test_cost_time = 0
+        total_start_time = time.time()
+        print(repo, end='')
         batch_iter = data_dict[org]
         train_batch = batch_iter.__next__()
         train_X = np.array(train_batch[0])
@@ -95,23 +97,27 @@ def run_monthly(clf, print_time=False, print_prf=False, print_prf_each=False, pr
                 continue
             test_X = np.array(batch[0])
             test_y = np.array(batch[1])
+            train_start_time = time.time()
             train(clf, train_X, train_y)
-
+            train_cost_time += time.time() - train_start_time
 
             actual_result += test_y.tolist()  # 真实结果
+            test_start_time = time.time()
             predict_result += clf.predict(test_X).tolist()  # 预测结果
+            test_cost_time += time.time() - test_start_time
             predict_result_prob += [x[0] for x in clf.predict_proba(test_X).tolist()]
             samples += test_X.size
 
 
             train_X = np.concatenate((train_X, test_X))
             train_y = np.concatenate((train_y, test_y))
-
+        total_cost_time = time.time() - total_start_time
         acc_num = 0
         for i in range(len(actual_result)):
             if actual_result[i] == predict_result[i]:
                 acc_num += 1
-        print(acc_num/len(actual_result), end='')
+        if print_acc:
+            print(',%f' % (acc_num/len(actual_result)), end='')
         if print_AUC:
             y = np.array(actual_result)
             pred = np.array(predict_result_prob)
@@ -132,8 +138,7 @@ def run_monthly(clf, print_time=False, print_prf=False, print_prf_each=False, pr
             print(',%f' % (main_proportion if main_proportion > 0.5 else 1 - main_proportion), end='')
 
         if print_time:
-            print(',%f' % ((time.time()-start_time)/len(actual_result)), end='')
-            start_time = time.time()
+            print(',%f,%f,%f' % (train_cost_time, test_cost_time, total_cost_time), end='')
         print()
 
 if __name__ == '__main__':
@@ -141,10 +146,11 @@ if __name__ == '__main__':
     # clf = XGBClassifier(seed=RANDOM_SEED)
     run_monthly(clf,
                 print_time=True,
+                print_acc=False,
                 print_prf=False,
-                print_prf_each=True,
+                print_prf_each=False,
                 print_main_proportion=False,
-                print_AUC=True,
+                print_AUC=False,
                 MonthGAP=6)
 
 

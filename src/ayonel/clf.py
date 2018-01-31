@@ -204,7 +204,7 @@ def run(client, clf, print_prf=False, print_main_proportion=False):
 
 # 按月训练
 @mongo
-def run_monthly(client, clf, print_time=True, over_sample=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1, persistence=False):
+def run_monthly(client, clf, print_time=True, over_sample=False, print_acc=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1, persistence=False):
     data_dict, pullinfo_list_dict = load_data_monthly(ayonel_numerical_attr=ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
                                   ayonel_categorical_attr_handler=ayonel_categorical_attr_handler, MonthGAP=MonthGAP)
 
@@ -265,8 +265,10 @@ def run_monthly(client, clf, print_time=True, over_sample=False, print_prf_each=
         return clf_list
 
     for org, repo in org_list:
-        start_time = time.time()
-        print(org+",", end='')
+        train_cost_time = 0
+        test_cost_time = 0
+        total_start_time = time.time()
+        print(org, end='')
         pullinfo_list = pullinfo_list_dict[org]
         batch_iter = data_dict[org]
         train_batch = batch_iter.__next__()
@@ -321,20 +323,25 @@ def run_monthly(client, clf, print_time=True, over_sample=False, print_prf_each=
                     train(clf, resample_train_X, resample_train_y)
             else:
                 if train_y.sum() != 0 and train_y.sum() != train_y.size:
+                    train_start_time = time.time()
                     train(clf, train_X, train_y)
+                    train_cost_time += time.time() - train_start_time
                 else:
                     train_X = np.concatenate((train_X, test_X))
                     train_y = np.concatenate((train_y, test_y))
                     continue
 
             actual_result += test_y.tolist()  # 真实结果
+            test_start_time = time.time()
             predict_result += clf.predict(test_X).tolist()  # 预测结果
+            test_cost_time += time.time() - test_start_time
             predict_result_prob += [x[0] for x in clf.predict_proba(test_X).tolist()]
             mean_accuracy += clf.score(test_X, test_y)
             train_X = np.concatenate((train_X, test_X))
             train_y = np.concatenate((train_y, test_y))
             round += 1
 
+        total_cost_time = time.time() - total_start_time
         acc_num = 0
         for i in range(len(actual_result)):
             if actual_result[i] == predict_result[i]:
@@ -356,7 +363,9 @@ def run_monthly(client, clf, print_time=True, over_sample=False, print_prf_each=
                 }
 
                 client[persistence_db][persistence_col].insert(data)
-        print(acc_num / len(actual_result), end='')
+
+        if print_acc:
+            print(',%f' % (acc_num / len(actual_result)), end='')
 
         if print_AUC:
             y = np.array(actual_result)
@@ -364,6 +373,9 @@ def run_monthly(client, clf, print_time=True, over_sample=False, print_prf_each=
             fpr, tpr, thresholds = roc_curve(y, pred)
             AUC = auc(fpr, tpr)
             print(',%f' % (AUC if AUC > 0.5 else 1 - AUC), end='')
+
+        # print(len(predict_result))
+
 
         if print_prf_each:
             merged_precision, merged_recall, merged_F1 = precision_recall_f1(predict_result, actual_result, POSITIVE=0)
@@ -375,10 +387,8 @@ def run_monthly(client, clf, print_time=True, over_sample=False, print_prf_each=
             main_proportion = predict_result.count(1) / len(predict_result)
             print(',%f' % (main_proportion if main_proportion > 0.5 else 1 - main_proportion), end='')
 
-
         if print_time:
-            print(',%f' % ((time.time()-start_time)/len(actual_result)), end='')
-            start_time = time.time()
+            print(',%f,%f,%f' % (train_cost_time, test_cost_time, total_cost_time), end='')
         print()
 
 
@@ -393,6 +403,7 @@ if __name__ == '__main__':
     run_monthly(clf,
                 print_time=True,
                 over_sample=False,
+                print_acc=False,
                 print_prf_each=False,
                 print_main_proportion=False,
                 print_AUC=False,
