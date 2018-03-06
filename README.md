@@ -80,6 +80,7 @@ history_author_passrate----->history_commit_passrate
 history_author_review_time----->history_commit_review_time
 #### gousios迁移
 ayonel表中的一些属性是由gousios表中迁移过来的，迁移的属性为gousios的输入
+#### IREC的项目组织类似，核心代码在ensembleresults文件夹下
 
 
 
