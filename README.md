@@ -1,5 +1,5 @@
 # DLPP文档
-该项目仅包含评审结果预测的算法部分，主要为```src```文件夹下的内容。项目已上传至[GitHub](https://github.com/ayonel/DLPP),可以fork到本地进行修改。
+该项目仅包含评审结果预测的算法部分，主要为```src```文件夹下的内容。项目已上传至[GitHub](https://github.com/ayonel/DLPP),可以fork到本地进行修改。已经删除了很多无用代码。
 
 ### 整体目录结构
 >*__DLPP__*
@@ -46,7 +46,7 @@ ayonel_numerical_attr 是输入的数值特征，ayonel_boolean_attr是输入的
 
 ### 数据库及表定义
 DLPP的MondoDB开在localhost的27017端口（默认端口），而决策者推荐（IREC）则开在localhost的27018端口。如果要开启DLPP的数据库，只需要以管理员权限运行cmd,  
-之后输入```net start MongoDB``即可。如果要开启IREC的数据库，在cmd中输入```mongod --dbpath=F:/mongodb2/data --port=27018```即可，为简单起见，我对
+之后输入```net start MongoDB```即可。如果要开启IREC的数据库，在cmd中输入```mongod --dbpath=F:/mongodb2/data --port=27018```即可，为简单起见，我对
 IREC的数据开启方法封装在了IREC的database中的dbutil的主方法中，只需要运行这个方法即可。MongoDB的管理工具使用robomongo
 
 DLPP的每个项目为一个数据库，库名为组织名称，每个库中有12个表，描述如下： 
@@ -68,7 +68,18 @@ DLPP的每个项目为一个数据库，库名为组织名称，每个库中有1
 #### mongo装饰器  
 对于需要连接数据库的方法，我封装了mongo装饰器，只需要在需要的方法前加上@mongo注解即可，在方法定义时传入一个client变量，调用时可不用传。
 
-
+#### 入库小心
+对于要入库的代码，一定要检查仔细，确保入库的结果是正确的，否则会花费很大的精力修改
+#### 字段对应
+为了论文的写作规范，论文中的一些特征命名与库中不一致，主要是：  
+is_reviewer-----> is_reviewer_commit  
+file_changes-----> files_changes
+history_author_pr_num----->history_commit_num
+history_author_pass_pr_num----->history_pass_pr_num
+history_author_passrate----->history_commit_passrate
+history_author_review_time----->history_commit_review_time
+#### gousios迁移
+ayonel表中的一些属性是由gousios表中迁移过来的，迁移的属性为gousios的输入
 
 
 
