@@ -80,6 +80,9 @@ def run(clf, print_prf=False, print_main_proportion=False):
 def run_monthly(clf, print_time=False, print_acc=False, print_prf=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1):
     data_dict = load_data_monthly(gousios_attr_list=gousios_attr_list, MonthGAP=MonthGAP)
     for org, repo in org_list:
+        outfile = open("../anova/" + repo + '.csv', "a", newline='')
+        writer = csv.writer(outfile)
+
         train_cost_time = 0
         test_cost_time = 0
         total_start_time = time.time()
@@ -116,6 +119,9 @@ def run_monthly(clf, print_time=False, print_acc=False, print_prf=False, print_p
         for i in range(len(actual_result)):
             if actual_result[i] == predict_result[i]:
                 acc_num += 1
+                writer.writerow([0, 1])
+            else:
+                writer.writerow([0, 0])
         if print_acc:
             print(',%f' % (acc_num/len(actual_result)), end='')
         if print_AUC:

@@ -186,3 +186,6 @@ week_feature_dict = {
     6: [0, 0, 0, 0, 0, 0, 1],
 }
 
+if __name__ == '__main__':
+    for org,repo in org_list:
+        print(org+','+repo)

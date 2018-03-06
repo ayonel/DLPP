@@ -43,7 +43,6 @@ from sklearn.metrics import roc_auc_score
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.naive_bayes import MultinomialNB
 from xgboost import XGBClassifier
-import xgboost as xgb
 from imblearn.over_sampling import SMOTE, ADASYN
 from sklearn.model_selection import train_test_split as tts
 from imblearn.combine import SMOTEENN
@@ -124,7 +123,8 @@ ayonel_numerical_attr = [
     'files_changes',
     'src_addition',
     'last_10_pr_merged',
-    'text_forward_link',
+    # 'text_forward_link',
+
 
     ## 以下属性无用
     # 'history_pass_pr_num',
@@ -265,6 +265,7 @@ def run_monthly(client, clf, print_time=True, over_sample=False, print_acc=False
         return clf_list
 
     for org, repo in org_list:
+
         train_cost_time = 0
         test_cost_time = 0
         total_start_time = time.time()
@@ -395,18 +396,18 @@ def run_monthly(client, clf, print_time=True, over_sample=False, print_acc=False
 
 if __name__ == '__main__':
 
-    # clf = SVC(probability=True)
+    # clf = SVC(probability=True, kernel='sigmoid')
     # clf = MultinomialNB()
     # clf = RandomForestClassifier(random_state=RANDOM_SEED)
     # clf = CostSensitiveBaggingClassifier()
     clf = XGBClassifier(seed=RANDOM_SEED)
     run_monthly(clf,
-                print_time=True,
+                print_time=False,
                 over_sample=False,
-                print_acc=False,
-                print_prf_each=False,
+                print_acc=True,
+                print_prf_each=True,
                 print_main_proportion=False,
-                print_AUC=False,
+                print_AUC=True,
                 MonthGAP=6,
                 persistence=False)
 

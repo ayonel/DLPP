@@ -1,0 +1,8 @@
+alter type v1 (f10.0).
+alter type v2 (f1.20).
+
+*Run One-Way ANOVA.
+ONEWAY V2 BY V1
+/STATISTICS DESCRIPTIVES 
+/MISSING ANALYSIS.
+
