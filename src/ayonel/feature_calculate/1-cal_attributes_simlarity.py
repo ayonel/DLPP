@@ -5,6 +5,7 @@
  GitHub: https://github.com/ayonel
  E-mail: ayonel@qq.com
  新增文本相似度以及文件相似度属性的计算
+ 使用update入库
 '''
 
 

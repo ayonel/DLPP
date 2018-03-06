@@ -4,41 +4,15 @@
  Blog: https://ayonel.me
  GitHub: https://github.com/ayonel
  E-mail: ayonel@qq.com
+  随机森林，对每轮次都调参，固定输入特征，并将调参结果入库
 '''
 import numpy as np
-import csv
 from src.ayonel.LoadData import *
 from src.constants import *
 from src.eval.eval_utils import precision_recall_f1
 from src.utils import *
-
-from sklearn.metrics import auc
-from sklearn.metrics import roc_curve
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import IsolationForest
-from sklearn.ensemble import ExtraTreesClassifier
-from sklearn.ensemble import AdaBoostClassifier
-from sklearn.ensemble import BaggingClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.naive_bayes import GaussianNB
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn.svm import SVC
 from sklearn.model_selection import GridSearchCV
-from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import StratifiedKFold
-from sklearn.model_selection import TimeSeriesSplit
-from sklearn.metrics import roc_auc_score
-from sklearn.tree import DecisionTreeClassifier
 from xgboost import XGBClassifier
-from imblearn.over_sampling import SMOTE, ADASYN
-from sklearn.model_selection import train_test_split as tts
-from imblearn.combine import SMOTEENN
-from sklearn.utils import shuffle
-from scipy.sparse import coo_matrix
-from costcla.models import CostSensitiveRandomForestClassifier
-from costcla.models import CostSensitiveBaggingClassifier
 
 SEG_PROPORTION = 8/10
 FOLDS = 5
@@ -91,7 +65,7 @@ def run_monthly(client, MonthGAP=1):
     data_dict, pullinfo_list_dict = load_data_monthly(ayonel_numerical_attr=ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
                                   ayonel_categorical_attr_handler=ayonel_categorical_attr_handler, MonthGAP=MonthGAP)
 
-    for org, repo in [('Baystation12','xx')]:
+    for org, repo in org_list:
         print(org+",")
         pullinfo_list = pullinfo_list_dict[org]
         batch_iter = data_dict[org]

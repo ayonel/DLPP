@@ -4,42 +4,16 @@
  Blog: https://ayonel.me
  GitHub: https://github.com/ayonel
  E-mail: ayonel@qq.com
+ xgboost，对每轮次都调参，固定输入特征，并将调参结果入库
 '''
+
 import numpy as np
-import csv
 from src.ayonel.LoadData import *
 from src.constants import *
-from src.eval.eval_utils import precision_recall_f1
 from src.utils import *
-
-from sklearn.metrics import auc
-from sklearn.metrics import roc_curve
-from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import IsolationForest
-from sklearn.ensemble import ExtraTreesClassifier
-from sklearn.ensemble import AdaBoostClassifier
-from sklearn.ensemble import BaggingClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.naive_bayes import GaussianNB
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn.svm import SVC
 from sklearn.model_selection import GridSearchCV
-from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import StratifiedKFold
-from sklearn.model_selection import TimeSeriesSplit
-from sklearn.metrics import roc_auc_score
-from sklearn.tree import DecisionTreeClassifier
 from xgboost import XGBClassifier
-from imblearn.over_sampling import SMOTE, ADASYN
-from sklearn.model_selection import train_test_split as tts
-from imblearn.combine import SMOTEENN
-from sklearn.utils import shuffle
-from scipy.sparse import coo_matrix
-from costcla.models import CostSensitiveRandomForestClassifier
-from costcla.models import CostSensitiveBaggingClassifier
-
 SEG_PROPORTION = 8/10
 FOLDS = 5
 # 按重要性排序之后的
@@ -110,41 +84,6 @@ ayonel_categorical_attr_handler = [
 
 def train(clf, X, y):
     clf.fit(X, y)
-
-
-@mongo
-def run(client, clf, print_prf=False, print_main_proportion=False):
-    attr_dict, label_dict, pullinfo_list_dict = load_data(ayonel_numerical_attr=ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
-                                  ayonel_categorical_attr_handler=ayonel_categorical_attr_handler)
-    ACC = 0.0
-    for org, repo in org_list:
-        input_X = attr_dict[org]
-        input_y = label_dict[org]
-        seg_point = int(len(input_X) * SEG_PROPORTION)
-
-        train_X = np.array(input_X[:seg_point])
-        train_y = np.array(input_y[:seg_point])
-        # X_sparse = coo_matrix(train_X)
-        #
-        # train_X, X_sparse, train_y = shuffle(train_X, X_sparse, train_y, random_state=0)
-        # train_X, train_y = AS().fit_sample(train_X, train_y)
-        test_X = np.array(input_X[seg_point:])
-        test_y = np.array(input_y[seg_point:])
-
-        train(clf, train_X, train_y)
-        accuracy = clf.score(test_X, test_y)
-        ACC += accuracy
-        predict_result = clf.predict(test_X).tolist()
-        actual_result = test_y.tolist()
-        precision, recall, F1 = precision_recall_f1(predict_result, actual_result)
-        print(accuracy, end='')
-        if print_prf:
-            print(",%f,%f,%f" % (precision, recall, F1), end='')
-        if print_main_proportion:
-            main_proportion = predict_result.count(1) / len(predict_result)
-            print(',%f' % (main_proportion if main_proportion > 0.5 else 1 - main_proportion), end='')
-        print()
-    print(ACC/len(org_list))
 
 
 # 按月训练

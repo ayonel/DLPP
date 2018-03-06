@@ -1,5 +1,4 @@
 # 为commit表删除重复sha
-import pymongo
 import src.database.dbutil as dbutil
 import src.constants as constants
 

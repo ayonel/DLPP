@@ -1,11 +1,11 @@
 # coding: utf-8
-# 计算一些属性
+# 计算一些属性，并入库
+# 使用insert方法入库，因此计算这一批属性是最先计算的属性
 
 from src.constants import *
 from src.database.dbutil import *
 import pymongo
 import re
-
 
 def build_empty_result_dict(pull_list):
     result_dict= {}

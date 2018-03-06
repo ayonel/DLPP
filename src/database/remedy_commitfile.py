@@ -1,6 +1,5 @@
 # 为commit表补齐additions以及deletions字段
 # 不要运行，运行了就会增加重复数据，还得运行delete_dup_sha.py
-import pymongo
 import src.database.dbutil as dbutil
 import src.constants as constants
 

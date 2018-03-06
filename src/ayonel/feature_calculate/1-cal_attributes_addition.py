@@ -4,7 +4,7 @@
  Blog: https://ayonel.me
  GitHub: https://github.com/ayonel
  E-mail: ayonel@qq.com
- 新增一些属性，使用数据库更新
+ 新增一些属性，入库使用update方法，是在原表中更新
 '''
 # coding: utf-8
 # 计算一些属性
@@ -50,7 +50,7 @@ def cal_src(pull_list, pull_dict, result_dict):
         result_dict[pull]['commits'] = pull_dict[pull]['commits']
     return result_dict
 
-# 正则匹配： (9cc8c6f3730) 或者  (#26696)
+# 正则匹配： (9cc8c6f3730，这儿匹配的范围有些大) 或者  (#26696)
 def forward_link_match(text):
     return re.search(r"\([a-z0-9]{11}\)", text) or re.search(r"\(#\d+?\)", text)
 
@@ -120,7 +120,7 @@ def review_time(pull_list, pull_dict, result_dict):
 def recent_event(client, pull_list, pull_dict, result_dict):
 
     # 构造一个list,格式为:(FLAG, created_at)
-    # FLAG:0----pr,  1----commit
+    # FLAG:0代表pr,  1代表commit
     L = []
     for pull in pull_dict:
         L.append((0, str(pull), pull_dict[pull]['created_at']))

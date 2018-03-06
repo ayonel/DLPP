@@ -4,15 +4,12 @@
  Blog: https://ayonel.me
  GitHub: https://github.com/ayonel
  E-mail: ayonel@qq.com
- 新增一些属性，使用数据库更新
+ 新增一些属性，主要是原来一些属性的衰减属性，衰减方法为原来的得分/时间间隔
 '''
-# coding: utf-8
 # 计算一些属性
 from src.constants import *
 from src.database.dbutil import *
-from src.utils import *
 import pymongo
-import re
 import sortedcontainers as sc
 
 
@@ -202,16 +199,13 @@ if __name__ == '__main__':
 
         # 获取file_merge_dict
         file_close_dict = get_file_close_dict(pull_dict)
-        # reviewer_set = set([x['name'] for x in list(client[org]['reviewer'].find())])
         result_dict = build_empty_result_dict(pull_list)
 
 
         result_dict = cal_history_pr_num_decay(pull_list, pull_dict, result_dict)
         result_dict = file_stat_decay(pull_dict, file_close_dict)
         result_dict = last_pr_decay(pull_dict, pull_list)
-        # 查询commitfile_list
-        commitfile_list = list(db['commitfile'].find())
-        # 计算代码属性
+
         for pr in result_dict:
             client[org]['ayonel'].update({'number': pr}, {'$set': result_dict[pr]})
 

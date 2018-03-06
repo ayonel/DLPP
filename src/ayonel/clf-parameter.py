@@ -6,44 +6,19 @@
  E-mail: ayonel@qq.com
 '''
 import numpy as np
-import csv
 from src.ayonel.LoadData import *
 from src.constants import *
 from src.eval.eval_utils import precision_recall_f1
 from src.utils import *
-
 from sklearn.metrics import auc
 from sklearn.metrics import roc_curve
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import IsolationForest
-from sklearn.ensemble import ExtraTreesClassifier
-from sklearn.ensemble import AdaBoostClassifier
-from sklearn.ensemble import BaggingClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.naive_bayes import GaussianNB
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn.svm import SVC
-from sklearn.model_selection import GridSearchCV
-from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import StratifiedKFold
-from sklearn.model_selection import TimeSeriesSplit
-from sklearn.metrics import roc_auc_score
-from sklearn.tree import DecisionTreeClassifier
 from xgboost.sklearn import XGBClassifier
-from imblearn.over_sampling import SMOTE, ADASYN
-from sklearn.model_selection import train_test_split as tts
-from imblearn.combine import SMOTEENN
-from sklearn.utils import shuffle
-from scipy.sparse import coo_matrix
-from costcla.models import CostSensitiveRandomForestClassifier
-from costcla.models import CostSensitiveBaggingClassifier
 
 SEG_PROPORTION = 8/10
 FOLDS = 5
-# 按单特征分类器重要性排序之后的
 
+# 0 代表数值属性
+# 1 代表bool属性
 attrs = [
     ('history_commit_passrate', 0),
     ('history_pass_pr_num', 0),
@@ -92,42 +67,7 @@ def train(clf, X, y):
     clf.fit(X, y)
 
 
-@mongo
-def run(client, clf, print_prf=False, print_main_proportion=False):
-    attr_dict, label_dict, pullinfo_list_dict = load_data(ayonel_numerical_attr=ayonel_numerical_attr, ayonel_boolean_attr=ayonel_boolean_attr,
-                                  ayonel_categorical_attr_handler=ayonel_categorical_attr_handler)
-    ACC = 0.0
-    for org, repo in org_list:
-        input_X = attr_dict[org]
-        input_y = label_dict[org]
-        seg_point = int(len(input_X) * SEG_PROPORTION)
-
-        train_X = np.array(input_X[:seg_point])
-        train_y = np.array(input_y[:seg_point])
-        # X_sparse = coo_matrix(train_X)
-        #
-        # train_X, X_sparse, train_y = shuffle(train_X, X_sparse, train_y, random_state=0)
-        # train_X, train_y = AS().fit_sample(train_X, train_y)
-        test_X = np.array(input_X[seg_point:])
-        test_y = np.array(input_y[seg_point:])
-
-        train(clf, train_X, train_y)
-        accuracy = clf.score(test_X, test_y)
-        ACC += accuracy
-        predict_result = clf.predict(test_X).tolist()
-        actual_result = test_y.tolist()
-        precision, recall, F1 = precision_recall_f1(predict_result, actual_result)
-        print(accuracy, end='')
-        if print_prf:
-            print(",%f,%f,%f" % (precision, recall, F1), end='')
-        if print_main_proportion:
-            main_proportion = predict_result.count(1) / len(predict_result)
-            print(',%f' % (main_proportion if main_proportion > 0.5 else 1 - main_proportion), end='')
-        print()
-    print(ACC/len(org_list))
-
-
-# 按月训练
+# 按月训练，与clf中的run_monthly类似，主要是返回值有区别
 @mongo
 def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_proportion=False, print_AUC=False, MonthGAP=1, persistence=False, ayonel_numerical_attr=None, ayonel_boolean_attr=None):
 
@@ -190,11 +130,6 @@ def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_p
 
         accuracy += acc_num / len(actual_result)
 
-        # precision, recall, F1 = precision_recall_f1(predict_result, actual_result)
-        #
-        # if print_prf:
-        #     print(',%f,%f,%f' % (precision, recall, F1), end='')
-        #
         if print_prf_each:
             try:
                 merged_precision, merged_recall, merged_F1 = precision_recall_f1(predict_result, actual_result, POSITIVE=0)
@@ -246,12 +181,11 @@ def run_monthly(client, clf, print_prf=False, print_prf_each=False, print_main_p
                mean_rejected_recall/len(org_list)
 
 
-
 if __name__ == '__main__':
 
     clf = XGBClassifier(seed=RANDOM_SEED)
-
-    outfile = open('feature_selection/feature_selection.csv', "w", encoding="utf-8", newline="")
+    # 特征选择的输出文件
+    outfile = open('feature_selection_data/feature_selection.csv', "w", encoding="utf-8", newline="")
     writer = csv.writer(outfile)
     base = 0
     AUC = 0

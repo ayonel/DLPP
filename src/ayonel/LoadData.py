@@ -1,10 +1,10 @@
-# coding: utf-8
+# 用于数据加载
 
 from src.constants import *
 from src.database.dbutil import *
 
 
-# 归一化数值属性
+# 归一化数值属性，主要将数值属性规约到[0,1]区间
 def regular(attrdata_list, ayonel_regular_attr):
     for arg in ayonel_regular_attr:
         max_v = max(attrdata_list, key=lambda x: float(x[arg]))[arg]
@@ -26,10 +26,11 @@ def week_handler(week):
     return week_feature_dict[week]
 
 
+# 获取commits数量在50+的pr
 def getBadSet(org, client):
     return set([x['number'] for x in list(client[org]['pullinfo'].find({'commits': {'$gt': 50}}, {'number':1}))])
 
-
+# 定义一个按月份划分的数据集迭代器
 class MonthData(object):
     def __init__(self, data, gap=1):
         self.X = data[0]
@@ -60,12 +61,14 @@ class MonthData(object):
             self.cursor += count
             return (X_batch, y_batch)
         raise StopIteration()
+
     def reset(self):
         self.start_month = self.X[0][0]  # 第一个月
         self.end_month = self.start_month + self.gap
         self.cursor = 0
 
 
+# 直接加载完整的数据集
 @mongo
 def load_data(client, ayonel_numerical_attr=None, ayonel_boolean_attr=None, ayonel_categorical_attr_handler=None):
     attr_dict = {}      # 键为每个项目，值为每个项目的X
@@ -82,6 +85,7 @@ def load_data(client, ayonel_numerical_attr=None, ayonel_boolean_attr=None, ayon
         for attr, handler in ayonel_categorical_attr_handler:
             for k, v in enumerate(attrdata_list):
                 attrdata_list[k][attr] = handler(v[attr])
+
         attr_list = []
         # 先构造一个字典，key-value分别为number和merged
         is_merged = {}
@@ -104,6 +108,7 @@ def load_data(client, ayonel_numerical_attr=None, ayonel_boolean_attr=None, ayon
     # print('data loaded over!!!')
     return (attr_dict, label_dict, pullinfo_list_dict)
 
+# 按月份划分加载数据集
 @mongo
 def load_data_monthly(client, ayonel_numerical_attr=None, ayonel_boolean_attr=None, ayonel_categorical_attr_handler=None, MonthGAP=1):
     data_dict = {}
@@ -120,8 +125,8 @@ def load_data_monthly(client, ayonel_numerical_attr=None, ayonel_boolean_attr=No
             for k, v in enumerate(attrdata_list):
                 attrdata_list[k][attr] = handler(v[attr])
         # 构造一个字典，key-value分别为number和merged
-        # 构造一个字典，key-value分别为number和month
         is_merged = {}
+        # 构造一个字典，key-value分别为number和month
         month_dict = {}
         pullinfo_list = list(client[org]['pullinfo'].find({}).sort('number'))
         for pullinfo in pullinfo_list:
@@ -141,13 +146,6 @@ def load_data_monthly(client, ayonel_numerical_attr=None, ayonel_boolean_attr=No
         for pull in attrdata_list:
             label_list.append(0 if is_merged[int(pull['number'])] else 1)
 
-        # for k, v in enumerate(attr_list):
-        #     # print(v)
-        #     if k!= 0:
-        #         if attr_list[k][0] < attr_list[k-1][0]:
-        #             print(attr_list[k-1])
-        #             print(attrdata_list[k-1])
-        # exit()
         data_dict[org] = MonthData((attr_list, label_list), gap=MonthGAP)
         pullinfo_list_dict[org] = pullinfo_list
     return data_dict, pullinfo_list_dict
