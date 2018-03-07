@@ -72,12 +72,12 @@ DLPP的每个项目为一个数据库，库名为组织名称，每个库中有1
 对于要入库的代码，一定要检查仔细，确保入库的结果是正确的，否则会花费很大的精力修改
 #### 字段对应
 为了论文的写作规范，论文中的一些特征命名与库中不一致，主要是：  
-is_reviewer-----> is_reviewer_commit  
-file_changes-----> files_changes
-history_author_pr_num----->history_commit_num
-history_author_pass_pr_num----->history_pass_pr_num
-history_author_passrate----->history_commit_passrate
-history_author_review_time----->history_commit_review_time
+is_reviewer-----> is_reviewer_commit   
+file_changes-----> files_changes  
+history_author_pr_num----->history_commit_num  
+history_author_pass_pr_num----->history_pass_pr_num  
+history_author_passrate----->history_commit_passrate  
+history_author_review_time----->history_commit_review_time  
 #### gousios迁移
 ayonel表中的一些属性是由gousios表中迁移过来的，迁移的属性为gousios的输入
 #### IREC的项目组织类似，核心代码在ensembleresults文件夹下
