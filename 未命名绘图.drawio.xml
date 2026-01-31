@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36" version="29.3.6">
   <diagram name="第 1 页" id="jtS8tAVUm55LNjZWBJyr">
-    <mxGraphModel dx="2610" dy="988" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="2411" dy="878" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -10,6 +10,16 @@
         </mxCell>
         <mxCell id="DECD_GuajW45FSVSIikg-43" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fad7ac;strokeColor=#b46504;" value="" vertex="1">
           <mxGeometry height="280" width="430" x="30" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="FWOYegzFzDk7QGxeqH1t-2" edge="1" parent="1" source="DECD_GuajW45FSVSIikg-56" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=8 4 1 4;flowAnimation=1;strokeWidth=3;strokeColor=#FF0000;" target="FWOYegzFzDk7QGxeqH1t-4">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="650" y="730" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FWOYegzFzDk7QGxeqH1t-5" connectable="0" parent="FWOYegzFzDk7QGxeqH1t-2" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="QPS17" vertex="1">
+          <mxGeometry relative="1" x="0.09" y="-1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
         </mxCell>
         <mxCell id="DECD_GuajW45FSVSIikg-56" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;dashed=1;" value="" vertex="1">
           <mxGeometry height="120" width="620" x="-140" y="670" as="geometry" />
@@ -331,6 +341,9 @@
         </mxCell>
         <mxCell id="DECD_GuajW45FSVSIikg-117" parent="DECD_GuajW45FSVSIikg-119" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;span style=&quot;color: rgb(255, 255, 255); font-size: 10px;&quot;&gt;方舟&lt;/span&gt;" vertex="1">
           <mxGeometry height="30" width="60" as="geometry" />
+        </mxCell>
+        <mxCell id="FWOYegzFzDk7QGxeqH1t-4" parent="1" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#000033;" value="&lt;font color=&quot;#ffffff&quot;&gt;最终限流丢弃&lt;/font&gt;" vertex="1">
+          <mxGeometry height="100" width="100" x="695" y="680" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
